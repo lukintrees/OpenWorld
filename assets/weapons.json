@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "Basic Knife",
+    "texture": "tile:51"
+  },
+  {
+    "id": 2,
+    "name": "kalash",
+    "texture": "tiles:690-691"
+  }
+]
