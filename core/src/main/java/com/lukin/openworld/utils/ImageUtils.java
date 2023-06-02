@@ -44,8 +44,7 @@ public class ImageUtils {
         TextureRegion tileTexture = tileSets.getTile(tileID).getTextureRegion();
         Pixmap pixmap = new Pixmap(16, 16, Pixmap.Format.RGBA8888);
         pixmap.drawPixmap(tileSetPixmap, 0, 0, tileTexture.getRegionX(), tileTexture.getRegionY(), tileTexture.getRegionWidth(), tileTexture.getRegionHeight());
-        Texture texture = new Texture(pixmap);
-        return texture;
+        return new Texture(pixmap);
     }
 
     public static Texture getMultipleTilesTexture(int[] tilesID, TiledMapTileSets tileSets, Pixmap tileSetPixmap) {
@@ -57,8 +56,7 @@ public class ImageUtils {
                     16, 16,
                     0, (tilesID.length - j - 1) * 16, 16, 16);
         }
-        Texture texture = new Texture(pixmap);
-        return texture;
+        return new Texture(pixmap);
     }
 
     public static Texture getMultipleTilesTextureHorizontal(int[] tilesID, TiledMapTileSets tileSets, Pixmap tileSetPixmap){

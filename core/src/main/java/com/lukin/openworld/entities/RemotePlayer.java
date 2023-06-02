@@ -1,8 +1,5 @@
 package com.lukin.openworld.entities;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.lukin.openworld.LKGame;
 import com.lukin.openworld.components.AnimationComponent;
@@ -10,7 +7,6 @@ import com.lukin.openworld.components.EntityComponent;
 import com.lukin.openworld.components.HitboxComponent;
 import com.lukin.openworld.components.WeaponPlayerComponent;
 import com.lukin.openworld.utils.EntityLoader;
-import com.lukin.openworld.utils.ImageUtils;
 
 public class RemotePlayer extends LKEntity{
 
@@ -27,7 +23,7 @@ public class RemotePlayer extends LKEntity{
         entityComponent.maxHealth = 200f;
         entityComponent.direction = direction;
         AnimationComponent animationComponent = addAndReturn(new AnimationComponent());
-        animationComponent.animation = ImageUtils.loadAnimation(entityLoader.getEntity(entityId).animation);
+        animationComponent.animation = EntityLoader.loadEntityAnimation(entityLoader.getEntity(entityId).animation);
         animationComponent.animationTime = animationTime;
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
         weaponComponent.texture = EntityLoader.loadWeaponTexture(entityLoader.getWeapon(weaponId).texture);

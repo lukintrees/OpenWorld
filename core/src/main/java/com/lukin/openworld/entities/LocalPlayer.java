@@ -10,7 +10,6 @@ import com.lukin.openworld.components.HitboxComponent;
 import com.lukin.openworld.components.InputComponent;
 import com.lukin.openworld.components.WeaponPlayerComponent;
 import com.lukin.openworld.utils.EntityLoader;
-import com.lukin.openworld.utils.ImageUtils;
 
 public class LocalPlayer extends LKEntity{
 
@@ -25,7 +24,7 @@ public class LocalPlayer extends LKEntity{
         entityComponent.setMaxHealth(200f);
         add(inputComponent);
         AnimationComponent animationComponent = addAndReturn(new AnimationComponent());
-        animationComponent.animation = ImageUtils.loadAnimation(entityLoader.getEntity(entityId).animation);
+        animationComponent.animation = EntityLoader.loadEntityAnimation(entityLoader.getEntity(entityId).animation);
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
         weaponComponent.texture = EntityLoader.loadWeaponTexture(entityLoader.getWeapon(weaponId).texture);
         Pixmap pixmap = new Pixmap(2, 2, Pixmap.Format.RGBA8888);

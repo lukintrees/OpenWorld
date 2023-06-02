@@ -3,7 +3,7 @@ package com.lukin.openworld;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -46,6 +46,7 @@ public class LKGame extends Game {
     private EntityLoader entityLoader;
     private Multiplayer multiplayer;
     private MultiplayerManagerThread multiplayerManagerThread;
+    private AssetManager assetManager;
     private static LKGame instance;
 
 
@@ -60,6 +61,7 @@ public class LKGame extends Game {
         stage = new Stage(new FitViewport(20 * 16 * 1.78f, 20 * 16));
         Gdx.input.setInputProcessor(stage);
         engine = new Engine();
+        assetManager = new AssetManager();
         generator = new FreeTypeFontGenerator(Gdx.files.internal("Roboto-Black.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         fontParameter.characters = DEFAULT_CHARS_FOR_FONT;
@@ -145,6 +147,10 @@ public class LKGame extends Game {
     public static BitmapFont getDefaultFont(){
         return getInstance().bitmapFont;
     }
+    public static AssetManager getAssetManager() {
+        return getInstance().assetManager;
+    }
+
     public static void setMap(TiledMap map){
         LKGame game = getInstance();
         game.map = map;

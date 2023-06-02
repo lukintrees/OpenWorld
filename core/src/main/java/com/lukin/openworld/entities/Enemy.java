@@ -15,7 +15,6 @@ import com.lukin.openworld.components.HitboxComponent;
 import com.lukin.openworld.components.SteeringComponent;
 import com.lukin.openworld.components.WeaponPlayerComponent;
 import com.lukin.openworld.utils.EntityLoader;
-import com.lukin.openworld.utils.ImageUtils;
 
 public class Enemy extends LKEntity {
     @Deprecated
@@ -52,7 +51,7 @@ public class Enemy extends LKEntity {
         entityComponent.setHealth(50f);
         entityComponent.setMaxHealth(50f);
         AnimationComponent animationComponent = addAndReturn(new AnimationComponent());
-        animationComponent.animation = ImageUtils.loadAnimation(entityLoader.getEntity(entityId).animation);
+        animationComponent.animation = EntityLoader.loadEntityAnimation(entityLoader.getEntity(entityId).animation);
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
         weaponComponent.texture = EntityLoader.loadWeaponTexture(entityLoader.getWeapon(weaponId).texture);
         Pixmap pixmap = new Pixmap(2, 2, Pixmap.Format.RGBA8888);
@@ -75,7 +74,7 @@ public class Enemy extends LKEntity {
         entityComponent.maxHealth = 50f;
         entityComponent.direction = direction;
         AnimationComponent animationComponent = addAndReturn(new AnimationComponent());
-        animationComponent.animation = ImageUtils.loadAnimation(entityLoader.getEntity(entityId).animation);
+        animationComponent.animation = EntityLoader.loadEntityAnimation(entityLoader.getEntity(entityId).animation);
         animationComponent.animationTime = animationTime;
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
         weaponComponent.texture = EntityLoader.loadWeaponTexture(entityLoader.getWeapon(weaponId).texture);

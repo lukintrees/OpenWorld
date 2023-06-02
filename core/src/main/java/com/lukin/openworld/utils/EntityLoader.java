@@ -3,13 +3,14 @@ package com.lukin.openworld.utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSets;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.lukin.openworld.LKGame;
 
-public class EntityLoader {
+public class EntityLoader{
     private static final String ENTITY_FILE = "entities.json";
     private static final String WEAPON_FILE = "weapons.json";
     private final Array<EntityJson> entities;
@@ -92,7 +93,14 @@ public class EntityLoader {
         } else {
             return new Texture("kalash.png");
         }
+    }
 
+    public static Animation<Texture> loadEntityAnimation(int[][][] tilesId){
+        return ImageUtils.loadAnimation(tilesId);
+    }
+
+    public static Animation<Texture> loadEntityAnimation(int[][][] tilesId, TiledMapTileSets tileSets, float frameDuration){
+        return ImageUtils.loadAnimation(tilesId, tileSets, frameDuration);
     }
 
     public Array<EntityJson> getEntities() {
