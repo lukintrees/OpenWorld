@@ -34,6 +34,30 @@ public class EntityLoader {
         }
     }
 
+    public static int[][][] createAnimationArray(JsonValue animation) {
+        int maxWidth = 0;
+        int maxHeight = 0;
+        for (int i = 0; i < animation.size; i++) {
+            for (int j = 0; j < animation.get(i).size; j++) {
+                if (maxWidth < animation.get(i).size) {
+                    maxWidth = animation.get(i).size;
+                }
+                if (maxHeight < animation.get(i).get(j).size) {
+                    maxHeight = animation.get(i).get(j).size;
+                }
+            }
+        }
+        int[][][] animationArray = new int[animation.size][maxWidth][maxHeight];
+        for (int i = 0; i < animation.size; i++) {
+            for (int j = 0; j < animation.get(i).size; j++) {
+                for (int k = 0; k < animation.get(i).get(j).size; k++) {
+                    animationArray[i][j][k] = animation.get(i).get(j).getInt(k) + 1;
+                }
+            }
+        }
+        return animationArray;
+    }
+
     private WeaponJson createWeaponFromJsonValue(JsonValue value) {
         WeaponJson weapon = new WeaponJson();
         weapon.id = value.getInt("id");
@@ -56,7 +80,7 @@ public class EntityLoader {
         EntityJson entity = new EntityJson();
         entity.id = value.getInt("id");
         entity.name = value.getString("name");
-        entity.animation = ImageUtils.createAnimationArray(value.get("animation"));
+        entity.animation = createAnimationArray(value.get("animation"));
         return entity;
     }
 
@@ -66,7 +90,7 @@ public class EntityLoader {
         if (texture.length == 1){
             return ImageUtils.getSingleTileTexture(texture[0], tileSets, tileSetPixmap);
         } else {
-            return ImageUtils.getTextureByFilename("kalash.png", -5);
+            return new Texture("kalash.png");
         }
 
     }
