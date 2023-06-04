@@ -13,15 +13,14 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
 public class HealthBar extends Actor {
     private final EntityComponent player;
     private ShapeDrawer shapeDrawer;
+    private boolean isLoaded;
 
     public HealthBar(EntityComponent entityComponent) {
         player = entityComponent;
     }
-
     @Override
-    protected void setStage(Stage stage) {
-        super.setStage(stage);
-        if (stage != null){
+    public void draw(Batch batch, float parentAlpha) {
+        if(!isLoaded){
             Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
             pixmap.setColor(Color.WHITE);
             pixmap.drawPixel(0, 0);
@@ -30,10 +29,6 @@ public class HealthBar extends Actor {
             TextureRegion region = new TextureRegion(texture, 0, 0, 1, 1);
             shapeDrawer = new ShapeDrawer(getStage().getBatch(), region);
         }
-    }
-
-    @Override
-    public void draw(Batch batch, float parentAlpha) {
         shapeDrawer.setColor(Color.GRAY);
         shapeDrawer.filledRectangle(getX(), getY(), getWidth(), getHeight());
         shapeDrawer.setColor(Color.RED);

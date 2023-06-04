@@ -6,11 +6,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lukin.openworld.ui.GameScreen;
@@ -57,11 +61,13 @@ public class LKGame extends Game {
         camera = new OrthographicCamera();
         viewport = new FitViewport(15 * 16 * 1.78f, 15 * 16, camera);
         viewport.apply();
+        assetManager = new AssetManager();
         entityLoader = new EntityLoader();
+        map = new TmxMapLoader().load("map/map-" + MathUtils.random(1, 2) + ".tmx");
+        loadAllTextures();
         stage = new Stage(new FitViewport(20 * 16 * 1.78f, 20 * 16));
         Gdx.input.setInputProcessor(stage);
         engine = new Engine();
-        assetManager = new AssetManager();
         generator = new FreeTypeFontGenerator(Gdx.files.internal("Roboto-Black.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         fontParameter.characters = DEFAULT_CHARS_FOR_FONT;
@@ -74,6 +80,27 @@ public class LKGame extends Game {
         screens.put(Screen.MAIN, mainScreen);
         setScreen(mainScreen);
     }
+
+    private void loadAllTextures() {
+        Array<EntityLoader.EntityJson> entities = entityLoader.getEntities();
+        Array<EntityLoader.WeaponJson> weapons = entityLoader.getWeapons();
+        for (EntityLoader.EntityJson entity : entities) {
+            if (entity != null){
+                assetManager.load(entity.animation);
+            }
+
+        }
+        for (EntityLoader.WeaponJson weapon : weapons) {
+            if(weapon != null) {
+                assetManager.load(weapon.texture);
+            }
+        }
+        assetManager.load("JoystickR.png", Texture.class);
+        assetManager.load("KnobR.png", Texture.class);
+        assetManager.update();
+        assetManager.finishLoading();
+    }
+
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);

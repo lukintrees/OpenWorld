@@ -80,7 +80,7 @@ public class EntityLoader{
         String[] textureString = value.getString("texture").split(":");
         if (textureString[0].equals("tile")) {
             weapon.texture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ".weapon", Texture.class,
-                    new WeaponTextureLoader.WeaponTextureLoaderParameters(new int[]{Integer.parseInt(textureString[1])}));
+                    new WeaponTextureLoaderParameters(new int[]{Integer.parseInt(textureString[1])}));
         } else if (textureString[0].equals("tiles")) {
             String[] numberss = textureString[1].split("-");
             int[] numbers = new int[numberss.length];
@@ -88,7 +88,7 @@ public class EntityLoader{
                 numbers[i] = Integer.parseInt(numberss[i]);
             }
             weapon.texture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ".weapon", Texture.class,
-                    new WeaponTextureLoader.WeaponTextureLoaderParameters(numbers));
+                    new WeaponTextureLoaderParameters(numbers));
         }
         return weapon;
     }
@@ -97,7 +97,7 @@ public class EntityLoader{
         EntityJson entity = new EntityJson();
         entity.id = value.getInt("id");
         entity.name = value.getString("name");
-        entity.animation = new AssetDescriptor<>(ENTITY_FILE + "/" + entity.id + ".entity", animationClass, new EntityAnimationLoader.EntityAnimationLoaderParameters(createAnimationArray(value.get("animation"))));
+        entity.animation = new AssetDescriptor<>(ENTITY_FILE + "/" + entity.id + ".entity", animationClass, new EntityAnimationLoaderParameters(createAnimationArray(value.get("animation"))));
         return entity;
     }
 
@@ -129,7 +129,7 @@ public class EntityLoader{
         public AssetDescriptor<Texture> texture;
     }
 
-    public class EntityAnimationLoader extends SynchronousAssetLoader<Animation<Texture>, EntityAnimationLoader.EntityAnimationLoaderParameters>{
+    public class EntityAnimationLoader extends SynchronousAssetLoader<Animation<Texture>, EntityAnimationLoaderParameters>{
 
         public EntityAnimationLoader() {
             super(new FileHandleResolver() {
@@ -149,17 +149,17 @@ public class EntityLoader{
         public Animation<Texture> load(AssetManager assetManager, String fileName, FileHandle file, EntityAnimationLoaderParameters parameter) {
             return ImageUtils.loadAnimation(parameter.animation);
         }
+    }
 
-        public static class EntityAnimationLoaderParameters extends AssetLoaderParameters<Animation<Texture>>{
-            public int[][][] animation;
+    public static class EntityAnimationLoaderParameters extends AssetLoaderParameters<Animation<Texture>>{
+        public int[][][] animation;
 
-            public EntityAnimationLoaderParameters(int[][][] animation) {
-                this.animation = animation;
-            }
+        public EntityAnimationLoaderParameters(int[][][] animation) {
+            this.animation = animation;
         }
     }
 
-    public static class WeaponTextureLoader extends SynchronousAssetLoader<Texture, WeaponTextureLoader.WeaponTextureLoaderParameters>{
+    public static class WeaponTextureLoader extends SynchronousAssetLoader<Texture, WeaponTextureLoaderParameters>{
 
         public WeaponTextureLoader() {
             super(new FileHandleResolver() {
@@ -187,12 +187,13 @@ public class EntityLoader{
 
         }
 
-        public static class WeaponTextureLoaderParameters extends AssetLoaderParameters<Texture>{
-            public int[] texture;
 
-            public WeaponTextureLoaderParameters(int[] texture) {
-                this.texture = texture;
-            }
+    }
+    public static class WeaponTextureLoaderParameters extends AssetLoaderParameters<Texture>{
+        public int[] texture;
+
+        public WeaponTextureLoaderParameters(int[] texture) {
+            this.texture = texture;
         }
     }
 }

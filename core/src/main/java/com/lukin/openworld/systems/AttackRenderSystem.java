@@ -27,10 +27,10 @@ public class AttackRenderSystem extends EntitySystem implements EntityListener {
         for(Entity entity : entities){
             HitboxComponent hitbox = entity.getComponent(HitboxComponent.class);
             Texture texture = null;
-            if(entity.getComponent(TextureComponent.class)!= null){
+            if(entity.getComponent(TextureComponent.class) != null){
                 texture = entity.getComponent(TextureComponent.class).texture;
                 if (texture == null) continue;
-            } else if (entity.getComponent(AnimationComponent.class)!= null) {
+            } else if (entity.getComponent(AnimationComponent.class) != null) {
                 AnimationComponent animation = entity.getComponent(AnimationComponent.class);
                 texture = animation.animation.getKeyFrame(animation.animationTime, true);
             }

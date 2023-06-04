@@ -6,6 +6,7 @@ import static com.lukin.openworld.LKGame.DEFAULT_SCREEN_WIDTH;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -34,6 +35,7 @@ public class GameScreen implements Screen {
     private final SpriteBatch batch;
     private final Stage stage;
     private final Viewport viewport;
+    private final AssetManager assetManager;
     private OrthogonalTiledMapRenderer mapRenderer;
     private TiledMap map;
     private final Engine engine;
@@ -52,6 +54,7 @@ public class GameScreen implements Screen {
         this.stage = LKGame.getStage();
         this.viewport = LKGame.getViewport();
         this.engine = LKGame.getEngine();
+        this.assetManager = LKGame.getAssetManager();
     }
 
     @Override
@@ -131,9 +134,10 @@ public class GameScreen implements Screen {
     }
 
     private InputComponent loadUIButtons(){
-        Texture joystickBackground = new Texture(Gdx.files.internal("JoystickR.png"));
-        touchpad = new Touchpad(10, new Touchpad.TouchpadStyle(new TextureRegionDrawable(joystickBackground), new TextureRegionDrawable(new Texture(Gdx.files.internal("KnobR.png")))));
-        shootTouchpad = new Touchpad(20, new Touchpad.TouchpadStyle(new TextureRegionDrawable(joystickBackground), new TextureRegionDrawable(new Texture(Gdx.files.internal("KnobR.png")))));
+        Texture joystickBackground = assetManager.get("JoystickR.png", Texture.class);
+        Texture joystickKnob = assetManager.get("KnobR.png", Texture.class);
+        touchpad = new Touchpad(10, new Touchpad.TouchpadStyle(new TextureRegionDrawable(joystickBackground), new TextureRegionDrawable(joystickKnob)));
+        shootTouchpad = new Touchpad(20, new Touchpad.TouchpadStyle(new TextureRegionDrawable(joystickBackground), new TextureRegionDrawable(joystickKnob)));
         stage.addActor(touchpad);
         stage.addActor(shootTouchpad);
         InputComponent inputComponent = new InputComponent();
