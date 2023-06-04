@@ -1,6 +1,12 @@
 package com.lukin.openworld.utils;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetDescriptor;
+import com.badlogic.gdx.assets.AssetLoaderParameters;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.SynchronousAssetLoader;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -10,13 +16,21 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.lukin.openworld.LKGame;
 
+import java.util.Arrays;
+
 public class EntityLoader{
     private static final String ENTITY_FILE = "entities.json";
     private static final String WEAPON_FILE = "weapons.json";
+    private static AssetManager assetManager;
+    private static Class<Animation<Texture>> animationClass;
     private final Array<EntityJson> entities;
     private final Array<WeaponJson> weapons;
 
     public EntityLoader() {
+        animationClass = (Class<Animation<Texture>>) new Animation<Texture>(0, new Array<>()).getClass();
+        assetManager = LKGame.getAssetManager();
+        assetManager.setLoader(Texture.class, ".weapon", new WeaponTextureLoader());
+        assetManager.setLoader(animationClass, ".entity", new EntityAnimationLoader());
         String text = Gdx.files.internal(ENTITY_FILE).readString();
         JsonValue root = new JsonReader().parse(text);
         entities = new Array<>(root.size + 1);
@@ -65,14 +79,16 @@ public class EntityLoader{
         weapon.name = value.getString("name");
         String[] textureString = value.getString("texture").split(":");
         if (textureString[0].equals("tile")) {
-            weapon.texture = new int[]{Integer.parseInt(textureString[1])};
+            weapon.texture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ".weapon", Texture.class,
+                    new WeaponTextureLoader.WeaponTextureLoaderParameters(new int[]{Integer.parseInt(textureString[1])}));
         } else if (textureString[0].equals("tiles")) {
             String[] numberss = textureString[1].split("-");
             int[] numbers = new int[numberss.length];
             for (int i = 0; i < numberss.length; i++) {
                 numbers[i] = Integer.parseInt(numberss[i]);
             }
-            weapon.texture = numbers;
+            weapon.texture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ".weapon", Texture.class,
+                    new WeaponTextureLoader.WeaponTextureLoaderParameters(numbers));
         }
         return weapon;
     }
@@ -81,26 +97,8 @@ public class EntityLoader{
         EntityJson entity = new EntityJson();
         entity.id = value.getInt("id");
         entity.name = value.getString("name");
-        entity.animation = createAnimationArray(value.get("animation"));
+        entity.animation = new AssetDescriptor<>(ENTITY_FILE + "/" + entity.id + ".entity", animationClass, new EntityAnimationLoader.EntityAnimationLoaderParameters(createAnimationArray(value.get("animation"))));
         return entity;
-    }
-
-    public static Texture loadWeaponTexture(int[] texture){
-        TiledMapTileSets tileSets = LKGame.getMap().getTileSets();
-        Pixmap tileSetPixmap = ImageUtils.getPixmapFromTileSet(tileSets);
-        if (texture.length == 1){
-            return ImageUtils.getSingleTileTexture(texture[0], tileSets, tileSetPixmap);
-        } else {
-            return new Texture("kalash.png");
-        }
-    }
-
-    public static Animation<Texture> loadEntityAnimation(int[][][] tilesId){
-        return ImageUtils.loadAnimation(tilesId);
-    }
-
-    public static Animation<Texture> loadEntityAnimation(int[][][] tilesId, TiledMapTileSets tileSets, float frameDuration){
-        return ImageUtils.loadAnimation(tilesId, tileSets, frameDuration);
     }
 
     public Array<EntityJson> getEntities() {
@@ -122,12 +120,79 @@ public class EntityLoader{
     public static class EntityJson {
         public int id;
         public String name;
-        public int[][][] animation;
+        public AssetDescriptor<Animation<Texture>> animation;
     }
 
     public static class WeaponJson {
         public int id;
         public String name;
-        public int[] texture;
+        public AssetDescriptor<Texture> texture;
+    }
+
+    public class EntityAnimationLoader extends SynchronousAssetLoader<Animation<Texture>, EntityAnimationLoader.EntityAnimationLoaderParameters>{
+
+        public EntityAnimationLoader() {
+            super(new FileHandleResolver() {
+                @Override
+                public FileHandle resolve(String fileName) {
+                    return null;
+                }
+            });
+        }
+
+        @Override
+        public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, EntityAnimationLoaderParameters parameter) {
+            return null;
+        }
+
+        @Override
+        public Animation<Texture> load(AssetManager assetManager, String fileName, FileHandle file, EntityAnimationLoaderParameters parameter) {
+            return ImageUtils.loadAnimation(parameter.animation);
+        }
+
+        public static class EntityAnimationLoaderParameters extends AssetLoaderParameters<Animation<Texture>>{
+            public int[][][] animation;
+
+            public EntityAnimationLoaderParameters(int[][][] animation) {
+                this.animation = animation;
+            }
+        }
+    }
+
+    public static class WeaponTextureLoader extends SynchronousAssetLoader<Texture, WeaponTextureLoader.WeaponTextureLoaderParameters>{
+
+        public WeaponTextureLoader() {
+            super(new FileHandleResolver() {
+                @Override
+                public FileHandle resolve(String fileName) {
+                    return null;
+                }
+            });
+        }
+
+        @Override
+        public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, WeaponTextureLoaderParameters parameter) {
+            return null;
+        }
+
+        @Override
+        public Texture load(AssetManager assetManager, String fileName, FileHandle file, WeaponTextureLoaderParameters parameter) {
+            TiledMapTileSets tileSets = LKGame.getMap().getTileSets();
+            Pixmap tileSetPixmap = ImageUtils.getPixmapFromTileSet(tileSets);
+            if (parameter.texture.length == 1){
+                return ImageUtils.getSingleTileTexture(parameter.texture[0], tileSets, tileSetPixmap);
+            } else {
+                return new Texture("kalash.png");
+            }
+
+        }
+
+        public static class WeaponTextureLoaderParameters extends AssetLoaderParameters<Texture>{
+            public int[] texture;
+
+            public WeaponTextureLoaderParameters(int[] texture) {
+                this.texture = texture;
+            }
+        }
     }
 }

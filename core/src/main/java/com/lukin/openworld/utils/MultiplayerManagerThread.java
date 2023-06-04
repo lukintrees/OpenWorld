@@ -88,7 +88,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 }
                 LKGame.setMap(new TmxMapLoader().load("map/map-" + mapId + ".tmx"));
                 if (LKGame.getScreens().get(LKGame.Screen.GAME) == null) {
-                    LKGame.getScreens().put(LKGame.Screen.GAME, new GameScreen(LKGame.getStage(), LKGame.getViewport(), LKGame.getEngine()));
+                    LKGame.getScreens().put(LKGame.Screen.GAME, new GameScreen());
                 }
                 ((GameScreen) LKGame.getScreens().get(LKGame.Screen.GAME)).setServer(false);
                 LKGame.setScreen(LKGame.Screen.GAME);

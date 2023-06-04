@@ -87,7 +87,7 @@ public class LKGame extends Game {
             game.setScreen(game.screens.get(Screen.MAIN));
         } else if (screen == Screen.GAME) {
             if (game.screens.get(Screen.GAME) == null) {
-                game.screens.put(Screen.GAME, new GameScreen(game.stage, game.viewport, game.engine));
+                game.screens.put(Screen.GAME, new GameScreen());
             }
             game.setScreen(game.screens.get(Screen.GAME));
         } else if (screen == Screen.MULTIPLAYER){

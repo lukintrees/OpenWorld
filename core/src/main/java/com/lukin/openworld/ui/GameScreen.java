@@ -47,11 +47,11 @@ public class GameScreen implements Screen {
     private boolean isMultiplayer;
 
 
-    public GameScreen(Stage stage, Viewport viewport, Engine engine) {
+    public GameScreen() {
         this.batch = LKGame.getBatch();
-        this.stage = stage;
-        this.viewport = viewport;
-        this.engine = engine;
+        this.stage = LKGame.getStage();
+        this.viewport = LKGame.getViewport();
+        this.engine = LKGame.getEngine();
     }
 
     @Override

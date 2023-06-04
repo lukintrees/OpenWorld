@@ -23,10 +23,10 @@ public class RemotePlayer extends LKEntity{
         entityComponent.maxHealth = 200f;
         entityComponent.direction = direction;
         AnimationComponent animationComponent = addAndReturn(new AnimationComponent());
-        animationComponent.animation = EntityLoader.loadEntityAnimation(entityLoader.getEntity(entityId).animation);
+        animationComponent.animation = LKGame.getAssetManager().get(entityLoader.getEntity(entityId).animation);
         animationComponent.animationTime = animationTime;
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
-        weaponComponent.texture = EntityLoader.loadWeaponTexture(entityLoader.getWeapon(weaponId).texture);
+        weaponComponent.texture = LKGame.getAssetManager().get(entityLoader.getWeapon(weaponId).texture);
     }
 
     public void setPosition(Vector2 position){

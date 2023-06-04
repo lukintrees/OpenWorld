@@ -51,9 +51,9 @@ public class Enemy extends LKEntity {
         entityComponent.setHealth(50f);
         entityComponent.setMaxHealth(50f);
         AnimationComponent animationComponent = addAndReturn(new AnimationComponent());
-        animationComponent.animation = EntityLoader.loadEntityAnimation(entityLoader.getEntity(entityId).animation);
+        animationComponent.animation = LKGame.getAssetManager().get(entityLoader.getEntity(entityId).animation);
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
-        weaponComponent.texture = EntityLoader.loadWeaponTexture(entityLoader.getWeapon(weaponId).texture);
+        weaponComponent.texture = LKGame.getAssetManager().get(entityLoader.getWeapon(weaponId).texture);
         Pixmap pixmap = new Pixmap(2, 2, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.BLUE);
         pixmap.fillRectangle(0, 0, 2, 2);
@@ -74,10 +74,10 @@ public class Enemy extends LKEntity {
         entityComponent.maxHealth = 50f;
         entityComponent.direction = direction;
         AnimationComponent animationComponent = addAndReturn(new AnimationComponent());
-        animationComponent.animation = EntityLoader.loadEntityAnimation(entityLoader.getEntity(entityId).animation);
+        animationComponent.animation = LKGame.getAssetManager().get(entityLoader.getEntity(entityId).animation);
         animationComponent.animationTime = animationTime;
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
-        weaponComponent.texture = EntityLoader.loadWeaponTexture(entityLoader.getWeapon(weaponId).texture);
+        weaponComponent.texture = LKGame.getAssetManager().get(entityLoader.getWeapon(weaponId).texture);
         Pixmap pixmap = new Pixmap(2, 2, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.BLUE);
         pixmap.fillRectangle(0, 0, 2, 2);
