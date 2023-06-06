@@ -80,12 +80,12 @@ public class EntityLoader{
         String[] textureString = value.getString("texture").split(":");
         if (textureString[0].equals("tile")) {
             weapon.texture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ".weapon", Texture.class,
-                    new WeaponTextureLoaderParameters(new int[]{Integer.parseInt(textureString[1])}));
+                    new WeaponTextureLoaderParameters(new int[]{Integer.parseInt(textureString[1]) + 1}));
         } else if (textureString[0].equals("tiles")) {
             String[] numberss = textureString[1].split("-");
             int[] numbers = new int[numberss.length];
             for (int i = 0; i < numberss.length; i++) {
-                numbers[i] = Integer.parseInt(numberss[i]);
+                numbers[i] = Integer.parseInt(numberss[i]) + 1;
             }
             weapon.texture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ".weapon", Texture.class,
                     new WeaponTextureLoaderParameters(numbers));
@@ -182,9 +182,8 @@ public class EntityLoader{
             if (parameter.texture.length == 1){
                 return ImageUtils.getSingleTileTexture(parameter.texture[0], tileSets, tileSetPixmap);
             } else {
-                return new Texture("kalash.png");
+                return ImageUtils.getMultipleTilesTextureHorizontal(parameter.texture, tileSets, tileSetPixmap);
             }
-
         }
 
 

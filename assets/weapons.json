@@ -7,6 +7,7 @@
   {
     "id": 2,
     "name": "kalash",
-    "texture": "tiles:690-691"
+    "texture": "tiles:690-691",
+    "bullet_texture": "tile:692"
   }
 ]

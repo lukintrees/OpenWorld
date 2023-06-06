@@ -66,7 +66,7 @@ public class ImageUtils {
             pixmap.drawPixmap(tileSetPixmap,
                     tileTexture.getRegionX(), tileTexture.getRegionY(),
                     16, 16,
-                    (tilesID.length - j - 1) * 16, 0, 16, 16);
+                    j * 16, 0, 16, 16);
         }
         return new Texture(pixmap);
     }
