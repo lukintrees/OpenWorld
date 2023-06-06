@@ -18,6 +18,8 @@ public class RemotePlayer extends LKEntity{
         EntityLoader entityLoader = LKGame.getEntityLoader();
         HitboxComponent hitboxComponent = addAndReturn(new HitboxComponent());
         hitboxComponent.setPosition(position);
+        hitboxComponent.width = 16f;
+        hitboxComponent.height = 16f;
         EntityComponent entityComponent = addAndReturn(new EntityComponent(EntityComponent.EntityType.PLAYER, EntityComponent.EntityState.NEUTRAL));
         entityComponent.health = 200f;
         entityComponent.maxHealth = 200f;

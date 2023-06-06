@@ -5,10 +5,12 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.lukin.openworld.LKGame;
 import com.lukin.openworld.components.AnimationComponent;
+import com.lukin.openworld.components.BulletComponent;
 import com.lukin.openworld.components.EntityComponent;
 import com.lukin.openworld.components.HitboxComponent;
 import com.lukin.openworld.entities.Enemy;
@@ -79,19 +81,19 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
         if (!isServer) {
             if (type.equals("sync")) {
                 tmp = message.split("\\|");
-                String[] entities = tmp[0].split("&");
-                String mapId = tmp[1];
-                //??? нужна ли эта строка ???
-                //LKGame.invalidateScreen(LKGame.Screen.GAME);
-                for (String entity : entities) {
-                    deserializeEntity(entity);
-                }
-                LKGame.setMap(new TmxMapLoader().load("map/map-" + mapId + ".tmx"));
+                LKEntity.setEntitySequence(Integer.parseInt(tmp[0]));
+                String[] entities = tmp[1].split("&");
+                String mapId = tmp[2];
+                LKGame.setMap(LKGame.getAssetManager().get("map/map-" + mapId + ".tmx", TiledMap.class));
                 if (LKGame.getScreens().get(LKGame.Screen.GAME) == null) {
                     LKGame.getScreens().put(LKGame.Screen.GAME, new GameScreen());
                 }
                 ((GameScreen) LKGame.getScreens().get(LKGame.Screen.GAME)).setServer(false);
                 LKGame.setScreen(LKGame.Screen.GAME);
+                for (String entity : entities) {
+                    LKEntity entity1 = deserializeEntity(entity);
+                    engine.addEntity(entity1);
+                }
             } else if (type.equals("remove")) {
                 LKEntity[] entities = engine.getEntitiesFor(Family.all(EntityComponent.class).get()).toArray(LKEntity.class);
                 int uidForRemove = Integer.parseInt(message);
@@ -109,10 +111,15 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                         syncEntities.put(uidForUpdate, message);
                     }
                 }
+            } else if (type.equals("add")) {
+                LKEntity entity = deserializeEntity(message);
+                engine.addEntity(entity);
             }
         } else {
             if (type.equals("connected")) {
                 StringBuilder msg = new StringBuilder("sync|");
+                msg.append(LKEntity.getEntitySequence());
+                msg.append("|");
                 LKEntity[] entities = engine.getEntitiesFor(Family.all(EntityComponent.class).get()).toArray(LKEntity.class);
                 StringBuilder entityString = serializeEntity(entities[0]);
                 msg.append(entityString);
@@ -136,11 +143,12 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                     }
                 }
             }else if (type.equals("add")){
-                Entity entity = deserializeEntity(message);
+                LKEntity entity = deserializeEntity(message);
                 if (entity instanceof RemotePlayer){
                     devices.get(device).player = (RemotePlayer) entity;
                 }
-                syncEntities.put(Integer.parseInt(message.split("-",3)[1]), message);
+                syncEntities.put(entity.entityUID, message.replace("P", "LOCAL_P"));
+                engine.addEntity(entity);
             }
         }
 
@@ -163,7 +171,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
             entityString.append("-");
             entityString.append(entity.weaponID);
             entityString.append("-");
-            entityString.append(entityComponent.direction ? 1 : 0);
+            entityString.append(entityComponent.direction);
             entityString.append("-");
             HitboxComponent hitboxComponent = entity.getComponent(HitboxComponent.class);
             entityString.append("(").append(hitboxComponent.x).append(",").append(hitboxComponent.y).append(")");
@@ -187,7 +195,6 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 entity1 = new Enemy(Integer.parseInt(entityData[1]), Integer.parseInt(entityData[2]), Integer.parseInt(entityData[3])
                         , entityData[4].equals("1"), new Vector2().fromString(entityData[5]), Float.parseFloat(entityData[6]));
         }
-        engine.addEntity(entity1);
         LKEntity.setEntitySequence(Integer.parseInt(entityData[1]));
         return entity1;
     }
@@ -195,7 +202,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
     private void deserializeEntity(LKEntity entity,String entityStr){
         String[] entityData = entityStr.split("-");
         entity.weaponID = Integer.parseInt(entityData[3]);
-        entity.getComponent(EntityComponent.class).direction = entityData[4].equals("1");
+        entity.getComponent(EntityComponent.class).direction = Boolean.parseBoolean(entityData[4]);
         entity.getComponent(HitboxComponent.class).setPosition(new Vector2().fromString(entityData[5]));
         entity.getComponent(AnimationComponent.class).animationTime = Float.parseFloat(entityData[6]);
     }
@@ -208,8 +215,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 outputStream.write(data);
                 outputStream.write(0x04);
             } catch (IOException e) {
-                //ignore
-                //devices.remove(device);
+                devices.remove(device);
             }
         }
     }
@@ -225,7 +231,9 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                     syncEntities.put(entity.entityUID, entityString1.toString());
                     byte[] msg = "update|".concat(entityString1.toString()).getBytes();
                     for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()) {
-                        write(device.getKey(), msg);
+                        if (device.getValue().player != entity){
+                            write(device.getKey(), msg);
+                        }
                     }
                 }
             }
@@ -241,7 +249,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 if (localPlayer == null) return;
             }
             String serializedLocalPlayer = serializeEntity(localPlayer).toString();
-            if (syncEntities.get(localPlayer.entityUID) == null || !syncEntities.get(localPlayer.entityUID).equals(serializedLocalPlayer)){
+            if (syncEntities.get(localPlayer.entityUID) == null || !syncEntities.get(localPlayer.entityUID).equals(serializedLocalPlayer)) {
                 syncEntities.put(localPlayer.entityUID, serializedLocalPlayer);
                 byte[] msg = "update|".concat(serializedLocalPlayer).getBytes();
                 for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()) {
@@ -253,15 +261,30 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
 
     @Override
     public void entityAdded(Entity entity) {
-        if (isServer && entity.getComponent(EntityComponent.class) != null) {
-            LKEntity lkEntity = (LKEntity) entity;
-            StringBuilder entityString = serializeEntity(lkEntity);
-            byte[] msg = ("add|" + entityString).getBytes();
-            for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()) {
-                if (device.getValue().player != entity){
+        if (entity.getComponent(EntityComponent.class) != null) {
+            if (isServer) {
+                LKEntity lkEntity = (LKEntity) entity;
+                StringBuilder entityString = serializeEntity(lkEntity);
+                byte[] msg = ("add|" + entityString).getBytes();
+                for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()) {
+                    if (device.getValue().player != entity) {
+                        write(device.getKey(), msg);
+                        syncEntities.put(lkEntity.entityUID, entityString.toString());
+                    }
+                }
+            }else if(entity instanceof LocalPlayer){
+                LKEntity lkEntity = (LKEntity) entity;
+                StringBuilder entityString = serializeEntity(lkEntity);
+                byte[] msg = ("add|" + entityString).getBytes();
+                for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()) {
                     write(device.getKey(), msg);
                     syncEntities.put(lkEntity.entityUID, entityString.toString());
                 }
+            }
+        }
+        if (entity.getComponent(BulletComponent.class) != null) {
+            if (isServer) {
+                
             }
         }
     }

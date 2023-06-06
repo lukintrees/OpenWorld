@@ -62,6 +62,7 @@ public class LKGame extends Game {
         viewport = new FitViewport(15 * 16 * 1.78f, 15 * 16, camera);
         viewport.apply();
         assetManager = new AssetManager();
+        assetManager.setLoader(TiledMap.class, new TmxMapLoader());
         entityLoader = new EntityLoader();
         map = new TmxMapLoader().load("map/map-" + MathUtils.random(1, 2) + ".tmx");
         loadAllTextures();
@@ -94,6 +95,9 @@ public class LKGame extends Game {
             if(weapon != null) {
                 assetManager.load(weapon.texture);
             }
+        }
+        for (int i = 1; i < 3; i++) {
+            assetManager.load("map/map-" + i + ".tmx", TiledMap.class);
         }
         assetManager.load("JoystickR.png", Texture.class);
         assetManager.load("KnobR.png", Texture.class);

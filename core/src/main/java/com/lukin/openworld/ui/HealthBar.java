@@ -28,6 +28,7 @@ public class HealthBar extends Actor {
             pixmap.dispose();
             TextureRegion region = new TextureRegion(texture, 0, 0, 1, 1);
             shapeDrawer = new ShapeDrawer(getStage().getBatch(), region);
+            isLoaded = true;
         }
         shapeDrawer.setColor(Color.GRAY);
         shapeDrawer.filledRectangle(getX(), getY(), getWidth(), getHeight());

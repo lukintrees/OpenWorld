@@ -23,7 +23,11 @@ public class LKEntity extends Entity {
         hitboxComponent.setBounds(x, y, width, height);
     }
 
-    public static void setEntitySequence(int sequence){
+    public static void setEntitySequence(int sequence) {
         entitySequence = ++sequence;
+    }
+
+    public static int getEntitySequence(){
+        return entitySequence;
     }
 }

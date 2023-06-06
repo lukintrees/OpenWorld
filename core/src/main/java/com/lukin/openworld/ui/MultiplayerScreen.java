@@ -102,7 +102,6 @@ public class MultiplayerScreen implements Screen {
     @Override
     public void hide() {
         stage.clear();
-        stage.getViewport().update(Gdx.graphics.getHeight(), Gdx.graphics.getHeight(), true);
     }
 
     @Override

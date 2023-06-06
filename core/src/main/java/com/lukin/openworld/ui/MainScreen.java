@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -77,8 +78,7 @@ public class MainScreen implements Screen {
             });
         }
         //LKGame.setMap(new TmxMapLoader().load("map/map-1.tmx"));
-        if(LKGame.getMap() != null) LKGame.getMap().dispose();
-        LKGame.setMap(new TmxMapLoader().load("map/map-" + MathUtils.random(1, 2) + ".tmx"));
+        LKGame.setMap(LKGame.getAssetManager().get("map/map-" + MathUtils.random(1, 2) + ".tmx", TiledMap.class));
         stage.addActor(gameLabel);
         stage.addActor(startButtons);
         stage.addActor(copyright);

@@ -47,6 +47,7 @@ public class GameScreen implements Screen {
     private MultiplayerManagerThread multiplayerManagerThread;
     private boolean isServer = true;
     private boolean isMultiplayer;
+    private boolean firstResize;
 
 
     public GameScreen() {
@@ -61,11 +62,17 @@ public class GameScreen implements Screen {
     public void show() {
             this.map = LKGame.getMap();
             this.mapRenderer = new OrthogonalTiledMapRenderer(map, batch);
-            mapRenderer.setView(viewport.getCamera().combined, 0, 0, DEFAULT_SCREEN_WIDTH + 16f, DEFAULT_SCREEN_HEIGHT + 16f);
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    mapRenderer.setView(viewport.getCamera().combined, 0, 0, DEFAULT_SCREEN_WIDTH + 16f, DEFAULT_SCREEN_HEIGHT + 16f);
+                }
+            });
             backgroundLayer = (TiledMapTileLayer) map.getLayers().get("background");
             wallLayer = (TiledMapTileLayer) map.getLayers().get("walls");
             multiplayerManagerThread = LKGame.getMultiplayerManagerThread();
             isMultiplayer = multiplayerManagerThread.isMultiplayer();
+            firstResize = true;
             loadAshleySystems();
             InputComponent inputComponent = loadUIButtons();
             LocalPlayer player = loadBasicEntities(inputComponent);
@@ -93,8 +100,21 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
-        viewport.update(width, height, true);
+        //Из-за особенностей libgdx при переключении экранов, если загружать на этот экран из другово потоко,
+        //то на компьютере будет вылетать,тк нельзя запускать gl команды в другом потоке, а на телефоне используется gl es, поэтому можно(хоть и с непредвиденным резултатом)
+        if (firstResize){
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    stage.getViewport().update(width, height, true);
+                    viewport.update(width, height, true);
+                }
+            });
+            firstResize = false;
+        }else{
+            stage.getViewport().update(width, height, true);
+            viewport.update(width, height, true);
+        }
     }
 
     private void loadAshleySystems(){
