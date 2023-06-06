@@ -11,7 +11,7 @@ public class Bullet extends LKEntity {
             add(new BulletComponent());
             HitboxComponent hitboxComponent = addAndReturn(new HitboxComponent());
             if (bulletTexture != null){
-                hitboxComponent.setBounds(0, 0, bulletTexture.getWidth(), bulletTexture.getHeight());
+                hitboxComponent.setBounds(0, 0, 4, 3);
             }else{
                 hitboxComponent.setBounds(0, 0, 2, 2);
             }

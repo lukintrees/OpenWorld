@@ -16,19 +16,16 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.lukin.openworld.LKGame;
 
-import java.util.Arrays;
-
 public class EntityLoader{
     private static final String ENTITY_FILE = "entities.json";
     private static final String WEAPON_FILE = "weapons.json";
-    private static AssetManager assetManager;
     private static Class<Animation<Texture>> animationClass;
     private final Array<EntityJson> entities;
     private final Array<WeaponJson> weapons;
 
     public EntityLoader() {
         animationClass = (Class<Animation<Texture>>) new Animation<Texture>(0, new Array<>()).getClass();
-        assetManager = LKGame.getAssetManager();
+        AssetManager assetManager = LKGame.getAssetManager();
         assetManager.setLoader(Texture.class, ".weapon", new WeaponTextureLoader());
         assetManager.setLoader(animationClass, ".entity", new EntityAnimationLoader());
         String text = Gdx.files.internal(ENTITY_FILE).readString();
@@ -63,10 +60,10 @@ public class EntityLoader{
             }
         }
         int[][][] animationArray = new int[animation.size][maxWidth][maxHeight];
-        for (int i = 0; i < animation.size; i++) {
-            for (int j = 0; j < animation.get(i).size; j++) {
-                for (int k = 0; k < animation.get(i).get(j).size; k++) {
-                    animationArray[i][j][k] = animation.get(i).get(j).getInt(k) + 1;
+        for (int frame = 0; frame < animation.size; frame++) {
+            for (int x = 0; x < animation.get(frame).size; x++) {
+                for (int y = 0; y < animation.get(frame).get(x).size; y++) {
+                    animationArray[frame][x][y] = animation.get(frame).get(x).get(y).asInt() + 1;
                 }
             }
         }
@@ -80,15 +77,28 @@ public class EntityLoader{
         String[] textureString = value.getString("texture").split(":");
         if (textureString[0].equals("tile")) {
             weapon.texture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ".weapon", Texture.class,
-                    new WeaponTextureLoaderParameters(new int[]{Integer.parseInt(textureString[1]) + 1}));
+                    new WeaponTextureLoaderParameters(new int[]{Integer.parseInt(textureString[1]) + 1}, null));
         } else if (textureString[0].equals("tiles")) {
-            String[] numberss = textureString[1].split("-");
-            int[] numbers = new int[numberss.length];
-            for (int i = 0; i < numberss.length; i++) {
-                numbers[i] = Integer.parseInt(numberss[i]) + 1;
+            String[] numbersString = textureString[1].split("-");
+            int[] numbers = new int[numbersString.length];
+            for (int i = 0; i < numbersString.length; i++) {
+                numbers[i] = Integer.parseInt(numbersString[i]) + 1;
             }
             weapon.texture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ".weapon", Texture.class,
-                    new WeaponTextureLoaderParameters(numbers));
+                    new WeaponTextureLoaderParameters(numbers, null));
+        }
+        String[] bulletTextureString = value.getString("bullet_texture").split(":");
+        if (bulletTextureString[0].equals("tile")) {
+            weapon.bulletTexture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ":bullet.weapon", Texture.class,
+                    new WeaponTextureLoaderParameters(null, new int[]{Integer.parseInt(bulletTextureString[1]) + 1}));
+        } else if (bulletTextureString[0].equals("tiles")) {
+            String[] numbersString = bulletTextureString[1].split("-");
+            int[] numbers = new int[numbersString.length];
+            for (int i = 0; i < numbersString.length; i++) {
+                numbers[i] = Integer.parseInt(numbersString[i]) + 1;
+            }
+            weapon.bulletTexture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ":bullet.weapon", Texture.class,
+                    new WeaponTextureLoaderParameters(null, numbers));
         }
         return weapon;
     }
@@ -127,9 +137,10 @@ public class EntityLoader{
         public int id;
         public String name;
         public AssetDescriptor<Texture> texture;
+        public AssetDescriptor<Texture> bulletTexture;
     }
 
-    public class EntityAnimationLoader extends SynchronousAssetLoader<Animation<Texture>, EntityAnimationLoaderParameters>{
+    public static class EntityAnimationLoader extends SynchronousAssetLoader<Animation<Texture>, EntityAnimationLoaderParameters>{
 
         public EntityAnimationLoader() {
             super(new FileHandleResolver() {
@@ -179,10 +190,18 @@ public class EntityLoader{
         public Texture load(AssetManager assetManager, String fileName, FileHandle file, WeaponTextureLoaderParameters parameter) {
             TiledMapTileSets tileSets = LKGame.getMap().getTileSets();
             Pixmap tileSetPixmap = ImageUtils.getPixmapFromTileSet(tileSets);
-            if (parameter.texture.length == 1){
-                return ImageUtils.getSingleTileTexture(parameter.texture[0], tileSets, tileSetPixmap);
-            } else {
-                return ImageUtils.getMultipleTilesTextureHorizontal(parameter.texture, tileSets, tileSetPixmap);
+            if (parameter.texture != null){
+                if (parameter.texture.length == 1){
+                    return ImageUtils.getSingleTileTexture(parameter.texture[0], tileSets, tileSetPixmap);
+                } else {
+                    return ImageUtils.getMultipleTilesTextureHorizontal(parameter.texture, tileSets, tileSetPixmap);
+                }
+            }else{
+                if (parameter.bulletTexture.length == 1){
+                    return ImageUtils.getSingleTileTexture(parameter.bulletTexture[0], tileSets, tileSetPixmap);
+                } else {
+                    return ImageUtils.getMultipleTilesTextureHorizontal(parameter.bulletTexture, tileSets, tileSetPixmap);
+                }
             }
         }
 
@@ -190,9 +209,11 @@ public class EntityLoader{
     }
     public static class WeaponTextureLoaderParameters extends AssetLoaderParameters<Texture>{
         public int[] texture;
+        public int[] bulletTexture;
 
-        public WeaponTextureLoaderParameters(int[] texture) {
+        public WeaponTextureLoaderParameters(int[] texture, int[] bulletTexture) {
             this.texture = texture;
+            this.bulletTexture = bulletTexture;
         }
     }
 }

@@ -34,7 +34,14 @@ public class AttackRenderSystem extends EntitySystem implements EntityListener {
                 AnimationComponent animation = entity.getComponent(AnimationComponent.class);
                 texture = animation.animation.getKeyFrame(animation.animationTime, true);
             }
-            batch.draw(texture, hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+
+            if (entity.getComponent(BulletComponent.class) != null) {
+                float rotation = entity.getComponent(BulletComponent.class).textureRotation;
+                batch.draw(texture, hitbox.x, hitbox.y, 0, 0, hitbox.width, hitbox.height, 6, 6, rotation, 0, 0, 16, 16, false, false);
+            }else{
+                batch.draw(texture, hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+            }
+
         }
     }
 

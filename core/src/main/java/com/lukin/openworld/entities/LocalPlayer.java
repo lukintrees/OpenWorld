@@ -26,11 +26,8 @@ public class LocalPlayer extends LKEntity{
         AnimationComponent animationComponent = addAndReturn(new AnimationComponent());
         animationComponent.animation = LKGame.getAssetManager().get(entityLoader.getEntity(entityId).animation);
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
-        weaponComponent.texture = LKGame.getAssetManager().get(entityLoader.getWeapon(weaponId).texture);
-/*        Pixmap pixmap = new Pixmap(2, 2, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.BLUE);
-        pixmap.fillRectangle(0, 0, 2, 2);
-        weaponComponent.bulletTexture = new Texture(pixmap);
-        pixmap.dispose();*/
+        EntityLoader.WeaponJson weapon = entityLoader.getWeapon(weaponId);
+        weaponComponent.texture = LKGame.getAssetManager().get(weapon.texture);
+        weaponComponent.bulletTexture = LKGame.getAssetManager().get(weapon.bulletTexture);
     }
 }

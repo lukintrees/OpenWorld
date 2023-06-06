@@ -126,13 +126,15 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
             WeaponPlayerComponent weaponPlayerComponent = localPlayer.getComponent(WeaponPlayerComponent.class);
             weaponPlayerComponent.delayFromAttack -= Gdx.graphics.getDeltaTime();
             if(weaponPlayerComponent.delayFromAttack >= 0) return;
+            EntityComponent entity = localPlayer.getComponent(EntityComponent.class);
             HitboxComponent hitbox = localPlayer.getComponent(HitboxComponent.class);
             Bullet bullet = new Bullet(weaponPlayerComponent.bulletTexture);
             HitboxComponent bulletHitbox = bullet.getComponent(HitboxComponent.class);
-            bulletHitbox.setPosition(hitbox.x, hitbox.y);
+            bulletHitbox.setPosition(hitbox.x + (entity.direction ? 0 : hitbox.width), hitbox.y + hitbox.height / 2);
             BulletComponent bulletComponent = bullet.getComponent(BulletComponent.class);
             float angle = MathUtils.atan2(input.shootTouchpad.getKnobPercentY(), input.shootTouchpad.getKnobPercentX());
-            bulletComponent.velocity.setAngleDeg(MathUtils.radiansToDegrees * angle);
+            bulletComponent.velocity.setAngleRad(angle);
+            bulletComponent.textureRotation = angle * MathUtils.radiansToDegrees;
             bulletComponent.owner = localPlayer;
             getEngine().addEntity(bullet);
             weaponPlayerComponent.delayFromAttack = weaponPlayerComponent.delayFromAttackBasic;

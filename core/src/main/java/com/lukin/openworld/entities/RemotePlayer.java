@@ -28,7 +28,9 @@ public class RemotePlayer extends LKEntity{
         animationComponent.animation = LKGame.getAssetManager().get(entityLoader.getEntity(entityId).animation);
         animationComponent.animationTime = animationTime;
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
-        weaponComponent.texture = LKGame.getAssetManager().get(entityLoader.getWeapon(weaponId).texture);
+        EntityLoader.WeaponJson weapon = entityLoader.getWeapon(weaponId);
+        weaponComponent.texture = LKGame.getAssetManager().get(weapon.texture);
+        weaponComponent.bulletTexture = LKGame.getAssetManager().get(weapon.bulletTexture);
     }
 
     public void setPosition(Vector2 position){

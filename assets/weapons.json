@@ -2,7 +2,8 @@
   {
     "id": 1,
     "name": "Basic Knife",
-    "texture": "tile:51"
+    "texture": "tile:51",
+    "bullet_texture": "false"
   },
   {
     "id": 2,

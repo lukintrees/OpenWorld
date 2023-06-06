@@ -94,6 +94,9 @@ public class LKGame extends Game {
         for (EntityLoader.WeaponJson weapon : weapons) {
             if(weapon != null) {
                 assetManager.load(weapon.texture);
+                if (weapon.bulletTexture != null){
+                    assetManager.load(weapon.bulletTexture);
+                }
             }
         }
         for (int i = 1; i < 3; i++) {

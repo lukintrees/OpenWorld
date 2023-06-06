@@ -132,6 +132,7 @@ public class EnemySystem extends EntitySystem implements EntityListener {
         BulletComponent bulletComponent = bullet.getComponent(BulletComponent.class);
         Vector2 subHitbox = new Vector2(targetHitbox.x - ownerHitbox.x, targetHitbox.y - ownerHitbox.y).nor();
         bulletComponent.velocity.scl(subHitbox.rotateDeg(MathUtils.random(-30f, 30f)));
+        bulletComponent.textureRotation = bulletComponent.velocity.angleDeg();
         bulletComponent.owner = owner;
         getEngine().addEntity(bullet);
         weaponPlayerComponent.delayFromAttack = weaponPlayerComponent.delayFromAttackBasic + MathUtils.random(0.2f);
