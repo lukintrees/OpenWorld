@@ -3,8 +3,6 @@ package com.lukin.openworld.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -12,7 +10,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.lukin.openworld.LKGame;
 import com.lukin.openworld.components.AnimationComponent;
 import com.lukin.openworld.components.BulletComponent;
@@ -42,7 +39,8 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
     public void update(float deltaTime) {
         if(localPlayer != null) {
             if(fistPlayerLoad) loadLocalPlayer();
-            updateLocalPlayerPosition(deltaTime);
+            checkWalkTouchpad(deltaTime);
+            setWeaponRotation();
             checkShootTouchpad();
             checkExit();
         }
@@ -100,7 +98,7 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
         camera.update();
     }
 
-    private void updateLocalPlayerPosition(float deltaTime) {
+    private void checkWalkTouchpad(float deltaTime) {
         InputComponent input = localPlayer.getComponent(InputComponent.class);
         if(input.touchpad.isTouched()){
             float addX = input.touchpad.getKnobPercentX() * deltaTime * SPEED_RATIO;
@@ -122,24 +120,46 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
 
     private void checkShootTouchpad(){
         InputComponent input = localPlayer.getComponent(InputComponent.class);
-        WeaponPlayerComponent weaponPlayerComponent = localPlayer.getComponent(WeaponPlayerComponent.class);
-        weaponPlayerComponent.delayFromAttack -= Gdx.graphics.getDeltaTime();
-        if(input.shootTouchpad.isTouched() && weaponPlayerComponent.delayFromAttack <= 0){
+        WeaponPlayerComponent weapon = localPlayer.getComponent(WeaponPlayerComponent.class);
+        weapon.delayFromAttack -= Gdx.graphics.getDeltaTime();
+        if(input.shootTouchpad.isTouched() && weapon.delayFromAttack <= 0){
             EntityComponent entity = localPlayer.getComponent(EntityComponent.class);
             HitboxComponent hitbox = localPlayer.getComponent(HitboxComponent.class);
-            Bullet bullet = new Bullet(weaponPlayerComponent.bulletTexture);
+            Bullet bullet = new Bullet(weapon.bulletTexture);
             HitboxComponent bulletHitbox = bullet.getComponent(HitboxComponent.class);
-            bulletHitbox.setPosition(hitbox.x + (entity.direction ? 0 : hitbox.width), hitbox.y + hitbox.height / 2);
+            bulletHitbox.setPosition(hitbox.x + (entity.direction ? -16 : hitbox.width + 16),
+                    hitbox.y + hitbox.height / 2);
             BulletComponent bulletComponent = bullet.getComponent(BulletComponent.class);
             float angle = MathUtils.atan2(input.shootTouchpad.getKnobPercentY(), input.shootTouchpad.getKnobPercentX());
             bulletComponent.velocity.setAngleRad(angle);
             bulletComponent.textureRotation = angle * MathUtils.radiansToDegrees;
             bulletComponent.owner = localPlayer;
             getEngine().addEntity(bullet);
-            weaponPlayerComponent.delayFromAttack = weaponPlayerComponent.delayFromAttackBasic;
+            weapon.delayFromAttack = weapon.delayFromAttackBasic;
         }
     }
 
+    private void setWeaponRotation(){
+        InputComponent input = localPlayer.getComponent(InputComponent.class);
+        WeaponPlayerComponent weapon = localPlayer.getComponent(WeaponPlayerComponent.class);
+        EntityComponent entity = localPlayer.getComponent(EntityComponent.class);
+        if (input.touchpad.isTouched() && !input.shootTouchpad.isTouched()){
+            weapon.weaponRotation = MathUtils.atan2(input.touchpad.getKnobPercentY(), input.touchpad.getKnobPercentX()) * MathUtils.radiansToDegrees;
+            if (entity.direction) {
+                weapon.weaponRotation += 180f;
+            }
+            return;
+        }
+        if (input.shootTouchpad.isTouched()){
+            if (entity.direction != input.shootTouchpad.getKnobPercentX() < 0){
+                entity.direction = !entity.direction;
+            }
+            weapon.weaponRotation = MathUtils.atan2(input.shootTouchpad.getKnobPercentY(), input.shootTouchpad.getKnobPercentX()) * MathUtils.radiansToDegrees;
+            if (entity.direction) {
+                weapon.weaponRotation += 180f;
+            }
+        }
+    }
     @Override
     public void entityAdded(Entity entity) {
         EntityComponent entityComponent = entity.getComponent(EntityComponent.class);

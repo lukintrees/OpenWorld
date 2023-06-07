@@ -37,9 +37,10 @@ public class EntitiyRenderSystem extends EntitySystem implements EntityListener 
             batch.draw(texture, hitbox.x, hitbox.y, texture.getWidth(), texture.getHeight(), 0, 0, texture.getWidth(), texture.getHeight(), entityComponent.direction, false);
             if (weapon != null && weapon.texture != null) {
                 if (weapon.texture.getWidth() == 16){
-                    batch.draw(weapon.texture, hitbox.x + (entityComponent.direction ? -hitbox.width / 2 - 1 : hitbox.width / 2 + 1), hitbox.y + 3, 0, 0, 16, 16, 1f, 1f, 0f, 0, 0, 16, 16, entityComponent.direction, false);
+                    batch.draw(weapon.texture, hitbox.x + (entityComponent.direction ? -hitbox.width / 2 - 1 : hitbox.width / 2 + 1), hitbox.y + 3, 0, 0, 16, 16, 1f, 1f, weapon.weaponRotation, 0, 0, 16, 16, entityComponent.direction, false);
                 }else {
-                    batch.draw(weapon.texture, hitbox.x + (entityComponent.direction ? -hitbox.getWidth() : hitbox.getWidth() - 10), hitbox.y, 0, 0, 32, 16, 0.8f, 0.8f, 0, 0, 0, 32, 16, entityComponent.direction, false);
+                    batch.draw(weapon.texture, hitbox.x + (entityComponent.direction ? -20 : hitbox.getWidth() - 10), hitbox.y - 2,
+                            entityComponent.direction ? 32 - 8 : 0, 0, 32, 16, 0.8f, 0.8f, weapon.weaponRotation, 0, 0, 32, 16, entityComponent.direction, false);
                 }
             }
         }
