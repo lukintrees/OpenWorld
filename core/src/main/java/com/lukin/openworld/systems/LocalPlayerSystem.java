@@ -127,10 +127,15 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
             HitboxComponent hitbox = localPlayer.getComponent(HitboxComponent.class);
             Bullet bullet = new Bullet(weapon.bulletTexture);
             HitboxComponent bulletHitbox = bullet.getComponent(HitboxComponent.class);
-            bulletHitbox.setPosition(hitbox.x + (entity.direction ? -16 : hitbox.width + 16),
-                    hitbox.y + hitbox.height / 2);
-            BulletComponent bulletComponent = bullet.getComponent(BulletComponent.class);
+            float weaponOriginX = hitbox.x + (entity.direction ? -20 : hitbox.width - 10) + (entity.direction ? 32 - 8 : 0);
+            float weaponOriginY = hitbox.y - 2;
+            float weaponLength = 14;
             float angle = MathUtils.atan2(input.shootTouchpad.getKnobPercentY(), input.shootTouchpad.getKnobPercentX());
+            float adjustedAngle = angle + (entity.direction ? 50 : -50);
+            float bulletOffsetX = weaponLength * MathUtils.cos(adjustedAngle);
+            float bulletOffsetY = weaponLength * MathUtils.sin(adjustedAngle);
+            bulletHitbox.setPosition(weaponOriginX + bulletOffsetX, weaponOriginY + bulletOffsetY);
+            BulletComponent bulletComponent = bullet.getComponent(BulletComponent.class);
             bulletComponent.velocity.setAngleRad(angle);
             bulletComponent.textureRotation = angle * MathUtils.radiansToDegrees;
             bulletComponent.owner = localPlayer;
