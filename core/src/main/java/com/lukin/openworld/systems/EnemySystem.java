@@ -21,6 +21,7 @@ import com.lukin.openworld.components.EnemyHearingComponent;
 import com.lukin.openworld.components.EntityComponent;
 import com.lukin.openworld.components.EntityComponent.EntityType;
 import com.lukin.openworld.components.HitboxComponent;
+import com.lukin.openworld.components.InputComponent;
 import com.lukin.openworld.components.SteeringComponent;
 import com.lukin.openworld.components.WeaponPlayerComponent;
 import com.lukin.openworld.entities.Bullet;
@@ -77,6 +78,7 @@ public class EnemySystem extends EntitySystem implements EntityListener {
                     enemyComponent.lastPosition.set(targetHitbox.x, targetHitbox.y);
                 }
                 if (!collisionDetector.collides(new Ray<>(new Vector2(enemyHitbox.x, enemyHitbox.y), new Vector2(targetHitbox.x + 1, targetHitbox.y + 1)))) {
+                    setWeaponRotation(entity, enemyHitbox, targetHitbox, weaponPlayerComponent);
                     shootBullet(entity, enemyHitbox, targetHitbox, weaponPlayerComponent);
                 }
                 SteeringAcceleration<Vector2> sa = new SteeringAcceleration<>(new Vector2());
@@ -130,12 +132,28 @@ public class EnemySystem extends EntitySystem implements EntityListener {
         HitboxComponent bulletHitbox = bullet.getComponent(HitboxComponent.class);
         bulletHitbox.setPosition(ownerHitbox.x, ownerHitbox.y + ownerHitbox.height / 2);
         BulletComponent bulletComponent = bullet.getComponent(BulletComponent.class);
-        Vector2 subHitbox = new Vector2(targetHitbox.x - ownerHitbox.x, targetHitbox.y - ownerHitbox.y).nor();
-        bulletComponent.velocity.scl(subHitbox.rotateDeg(MathUtils.random(-30f, 30f)));
-        bulletComponent.textureRotation = bulletComponent.velocity.angleDeg();
+        EntityComponent entity = owner.getComponent(EntityComponent.class);
+        float weaponOriginX = ownerHitbox.x + (entity.direction ? -20 : ownerHitbox.width - 10) + (entity.direction ? 32 - 8 : 0);
+        float weaponOriginY = ownerHitbox.y - 2;
+        float weaponLength = 14;
+        float angle = MathUtils.atan2(targetHitbox.y - ownerHitbox.y, targetHitbox.x - ownerHitbox.x);
+        float adjustedAngle = angle + (entity.direction ? 50 : -50);
+        float bulletOffsetX = weaponLength * MathUtils.cos(adjustedAngle);
+        float bulletOffsetY = weaponLength * MathUtils.sin(adjustedAngle);
+        bulletHitbox.setPosition(weaponOriginX + bulletOffsetX, weaponOriginY + bulletOffsetY);
+        bulletComponent.velocity.setAngleRad(angle);
+        bulletComponent.textureRotation = angle * MathUtils.radiansToDegrees;
         bulletComponent.owner = owner;
         getEngine().addEntity(bullet);
         weaponPlayerComponent.delayFromAttack = weaponPlayerComponent.delayFromAttackBasic + MathUtils.random(0.2f);
+    }
+
+    private void setWeaponRotation(Entity owner, HitboxComponent ownerHitbox, HitboxComponent targetHitbox, WeaponPlayerComponent weapon){
+        EntityComponent entity = owner.getComponent(EntityComponent.class);
+        weapon.weaponRotation = MathUtils.atan2(targetHitbox.y - ownerHitbox.y, targetHitbox.x - ownerHitbox.x) * MathUtils.radiansToDegrees;
+        if (entity.direction){
+            weapon.weaponRotation += 180;
+        }
     }
 
     @Override
