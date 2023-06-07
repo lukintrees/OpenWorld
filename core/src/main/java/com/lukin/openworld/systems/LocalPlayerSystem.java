@@ -122,10 +122,9 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
 
     private void checkShootTouchpad(){
         InputComponent input = localPlayer.getComponent(InputComponent.class);
-        if(input.shootTouchpad.isTouched()){
-            WeaponPlayerComponent weaponPlayerComponent = localPlayer.getComponent(WeaponPlayerComponent.class);
-            weaponPlayerComponent.delayFromAttack -= Gdx.graphics.getDeltaTime();
-            if(weaponPlayerComponent.delayFromAttack >= 0) return;
+        WeaponPlayerComponent weaponPlayerComponent = localPlayer.getComponent(WeaponPlayerComponent.class);
+        weaponPlayerComponent.delayFromAttack -= Gdx.graphics.getDeltaTime();
+        if(input.shootTouchpad.isTouched() && weaponPlayerComponent.delayFromAttack <= 0){
             EntityComponent entity = localPlayer.getComponent(EntityComponent.class);
             HitboxComponent hitbox = localPlayer.getComponent(HitboxComponent.class);
             Bullet bullet = new Bullet(weaponPlayerComponent.bulletTexture);

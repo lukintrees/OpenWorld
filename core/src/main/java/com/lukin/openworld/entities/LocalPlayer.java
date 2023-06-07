@@ -1,8 +1,5 @@
 package com.lukin.openworld.entities;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.lukin.openworld.LKGame;
 import com.lukin.openworld.components.AnimationComponent;
 import com.lukin.openworld.components.EntityComponent;
