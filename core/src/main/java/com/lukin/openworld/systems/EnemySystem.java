@@ -25,6 +25,7 @@ import com.lukin.openworld.components.InputComponent;
 import com.lukin.openworld.components.SteeringComponent;
 import com.lukin.openworld.components.WeaponPlayerComponent;
 import com.lukin.openworld.entities.Bullet;
+import com.lukin.openworld.entities.LKEntity;
 
 public class EnemySystem extends EntitySystem implements EntityListener {
     private Array<Entity> entities;
@@ -128,7 +129,7 @@ public class EnemySystem extends EntitySystem implements EntityListener {
 
     private void shootBullet(Entity owner, HitboxComponent ownerHitbox, HitboxComponent targetHitbox, WeaponPlayerComponent weaponPlayerComponent){
         if(weaponPlayerComponent.delayFromAttack >= 0) return;
-        Bullet bullet = new Bullet(weaponPlayerComponent.bulletTexture);
+        Bullet bullet = new Bullet(weaponPlayerComponent.bulletTexture, ((LKEntity) owner).weaponID);
         HitboxComponent bulletHitbox = bullet.getComponent(HitboxComponent.class);
         bulletHitbox.setPosition(ownerHitbox.x, ownerHitbox.y + ownerHitbox.height / 2);
         BulletComponent bulletComponent = bullet.getComponent(BulletComponent.class);
@@ -143,7 +144,7 @@ public class EnemySystem extends EntitySystem implements EntityListener {
         bulletHitbox.setPosition(weaponOriginX + bulletOffsetX, weaponOriginY + bulletOffsetY);
         bulletComponent.velocity.setAngleRad(angle);
         bulletComponent.textureRotation = angle * MathUtils.radiansToDegrees;
-        bulletComponent.owner = owner;
+        bulletComponent.owner = (LKEntity) owner;
         getEngine().addEntity(bullet);
         weaponPlayerComponent.delayFromAttack = weaponPlayerComponent.delayFromAttackBasic + MathUtils.random(0.2f);
     }

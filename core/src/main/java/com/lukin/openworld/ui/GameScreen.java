@@ -128,7 +128,7 @@ public class GameScreen implements Screen {
             EntitiyRenderSystem entitiyRenderSystem = new EntitiyRenderSystem();
             engine.addSystem(entitiyRenderSystem);
             engine.addEntityListener(entitiyRenderSystem);
-            AttackSystem attackSystem = new AttackSystem();
+            AttackSystem attackSystem = new AttackSystem(isServer);
             engine.addSystem(attackSystem);
             engine.addEntityListener(attackSystem);
             AttackRenderSystem attackRenderSystem = new AttackRenderSystem();
@@ -141,6 +141,9 @@ public class GameScreen implements Screen {
             LocalPlayerSystem localPlayerSystem = new LocalPlayerSystem((OrthographicCamera) viewport.getCamera());
             engine.addSystem(localPlayerSystem);
             engine.addEntityListener(localPlayerSystem);
+            AttackSystem attackSystem = new AttackSystem(isServer);
+            engine.addSystem(attackSystem);
+            engine.addEntityListener(attackSystem);
             EntitiyRenderSystem entitiyRenderSystem = new EntitiyRenderSystem();
             engine.addSystem(entitiyRenderSystem);
             engine.addEntityListener(entitiyRenderSystem);

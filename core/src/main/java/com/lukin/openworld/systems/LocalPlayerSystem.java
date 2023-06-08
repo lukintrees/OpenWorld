@@ -19,9 +19,10 @@ import com.lukin.openworld.components.HitboxComponent;
 import com.lukin.openworld.components.InputComponent;
 import com.lukin.openworld.components.WeaponPlayerComponent;
 import com.lukin.openworld.entities.Bullet;
+import com.lukin.openworld.entities.LKEntity;
 
 public class LocalPlayerSystem extends EntitySystem implements EntityListener {
-    private Entity localPlayer;
+    private LKEntity localPlayer;
     private final TiledMap map;
     private final OrthographicCamera camera;
     private static final int SPEED_RATIO = 100;
@@ -125,7 +126,7 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
         if(input.shootTouchpad.isTouched() && weapon.delayFromAttack <= 0){
             EntityComponent entity = localPlayer.getComponent(EntityComponent.class);
             HitboxComponent hitbox = localPlayer.getComponent(HitboxComponent.class);
-            Bullet bullet = new Bullet(weapon.bulletTexture);
+            Bullet bullet = new Bullet(weapon.bulletTexture, localPlayer.weaponID);
             HitboxComponent bulletHitbox = bullet.getComponent(HitboxComponent.class);
             float weaponOriginX = hitbox.x + (entity.direction ? -20 : hitbox.width - 10) + (entity.direction ? 32 - 8 : 0);
             float weaponOriginY = hitbox.y - 2;
@@ -170,7 +171,7 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
         EntityComponent entityComponent = entity.getComponent(EntityComponent.class);
         if (entityComponent != null && entityComponent.type == EntityType.LOCAL_PLAYER) {
             fistPlayerLoad = true;
-            localPlayer = entity;
+            localPlayer = (LKEntity) entity;
         }
     }
 

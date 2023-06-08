@@ -73,7 +73,7 @@ public class TCPMultiplayer implements Multiplayer{
                             outputStream.write(0x04);
                             byte[] name = new byte[128];
                             int bytesRead = socket.getInputStream().read(name);
-                            addresses.add(new MultiplayerManagerThread.Device(host, new String(name, 0, bytesRead)));
+                            addresses.add(new MultiplayerManagerThread.Device(host, new String(name, 1, bytesRead - 1)));
                             break;
                         }
                     } catch (IOException e) {

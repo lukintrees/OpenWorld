@@ -22,17 +22,19 @@ public class AttackSystem extends EntitySystem implements EntityListener {
     private final Array<Entity> damageEntities;
     private final Array<Entity> entities;
     private final TiledMapTileLayer collisionLayer;
+    private final boolean isServer;
 
-    public AttackSystem() {
+    public AttackSystem(boolean isServer) {
         damageEntities = new Array<>();
         entities = new Array<>();
         collisionLayer = (TiledMapTileLayer) LKGame.getMap().getLayers().get("collision");
+        this.isServer = isServer;
     }
 
     @Override
     public void update(float deltaTime) {
         for (Entity damageEntity : damageEntities) {
-            if (damageEntity.getComponent(BulletComponent.class)!= null) {
+            if (damageEntity.getComponent(BulletComponent.class) != null) {
                 BulletComponent bulletComponent = damageEntity.getComponent(BulletComponent.class);
                 bulletComponent.lifeTime -= deltaTime;
                 if (bulletComponent.lifeTime < 0) {
@@ -44,12 +46,13 @@ public class AttackSystem extends EntitySystem implements EntityListener {
                     if (bulletComponent.owner == entity) continue;
                     HitboxComponent entityHitbox = entity.getComponent(HitboxComponent.class);
                     if (bulletHitbox.overlaps(entityHitbox)) {
+                        if(entity instanceof Enemy) {
+                            entity.getComponent(EntityComponent.class).state = EntityComponent.EntityState.FOLLOW_PLAYER;
+                        }
                         if (entity instanceof LocalPlayer){
                             Gdx.input.vibrate(200);
                         }
-                        if(entity instanceof Enemy){
-                            entity.getComponent(EntityComponent.class).state = EntityComponent.EntityState.FOLLOW_PLAYER;
-                        }
+
                         EntityComponent entityComponent = entity.getComponent(EntityComponent.class);
                         entityComponent.health -= bulletComponent.damage;
                         if (entityComponent.health <= 0) {
