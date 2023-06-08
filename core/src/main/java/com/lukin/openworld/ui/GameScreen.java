@@ -13,10 +13,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lukin.openworld.LKGame;
@@ -29,6 +31,7 @@ import com.lukin.openworld.systems.EnemySpawnSystem;
 import com.lukin.openworld.systems.EnemySystem;
 import com.lukin.openworld.systems.EntitiyRenderSystem;
 import com.lukin.openworld.systems.LocalPlayerSystem;
+import com.lukin.openworld.utils.EntityLoader;
 import com.lukin.openworld.utils.MultiplayerManagerThread;
 
 public class GameScreen implements Screen {
@@ -172,7 +175,8 @@ public class GameScreen implements Screen {
         return inputComponent;
     }
     private LocalPlayer loadBasicEntities(InputComponent inputComponent){
-        LocalPlayer localPlayer = new LocalPlayer(1, 2, inputComponent);
+        LocalPlayer localPlayer = new LocalPlayer(MathUtils.randomBoolean() ? 1 : 5
+                , 2, inputComponent);
         localPlayer.setBounds(map.getProperties().get("spawnX", Integer.class) * 16, (40 - map.getProperties().get("spawnY", Integer.class)) * 16, 16, 16);
         engine.addEntity(localPlayer);
         return localPlayer;

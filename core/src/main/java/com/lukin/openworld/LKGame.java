@@ -113,23 +113,28 @@ public class LKGame extends Game {
         viewport.update(width, height);
     }
     public static void setScreen(Screen screen) {
-        LKGame game = getInstance();
-        if (screen == Screen.MAIN) {
-            if (game.screens.get(Screen.MAIN) == null) {
-                game.screens.put(Screen.MAIN, new MainScreen(game.stage, game.bitmapFont));
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                LKGame game = getInstance();
+                if (screen == Screen.MAIN) {
+                    if (game.screens.get(Screen.MAIN) == null) {
+                        game.screens.put(Screen.MAIN, new MainScreen(game.stage, game.bitmapFont));
+                    }
+                    game.setScreen(game.screens.get(Screen.MAIN));
+                } else if (screen == Screen.GAME) {
+                    if (game.screens.get(Screen.GAME) == null) {
+                        game.screens.put(Screen.GAME, new GameScreen());
+                    }
+                    game.setScreen(game.screens.get(Screen.GAME));
+                } else if (screen == Screen.MULTIPLAYER){
+                    if (game.screens.get(Screen.MULTIPLAYER) == null) {
+                        game.screens.put(Screen.MULTIPLAYER, new MultiplayerScreen());
+                    }
+                    game.setScreen(game.screens.get(Screen.MULTIPLAYER));
+                }
             }
-            game.setScreen(game.screens.get(Screen.MAIN));
-        } else if (screen == Screen.GAME) {
-            if (game.screens.get(Screen.GAME) == null) {
-                game.screens.put(Screen.GAME, new GameScreen());
-            }
-            game.setScreen(game.screens.get(Screen.GAME));
-        } else if (screen == Screen.MULTIPLAYER){
-            if (game.screens.get(Screen.MULTIPLAYER) == null) {
-                game.screens.put(Screen.MULTIPLAYER, new MultiplayerScreen());
-            }
-            game.setScreen(game.screens.get(Screen.MULTIPLAYER));
-        }
+        });
     }
 
     public static Map<Screen, com.badlogic.gdx.Screen> getScreens(){

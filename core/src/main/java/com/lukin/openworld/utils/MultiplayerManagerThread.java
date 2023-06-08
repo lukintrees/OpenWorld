@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
 import com.lukin.openworld.LKGame;
@@ -80,10 +81,15 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 }
                 ((GameScreen) LKGame.getScreens().get(LKGame.Screen.GAME)).setServer(false);
                 LKGame.setScreen(LKGame.Screen.GAME);
-                for (String entity : entitiesString) {
-                    LKEntity entity1 = deserializeEntity(entity);
-                    engine.addEntity(entity1);
-                }
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (String entity : entitiesString) {
+                            LKEntity entity1 = deserializeEntity(entity);
+                            engine.addEntity(entity1);
+                        }
+                    }
+                });
                 break;
             case "remove":
                 LKEntity[] entities = engine.getEntitiesFor(Family.all(EntityComponent.class).get()).toArray(LKEntity.class);

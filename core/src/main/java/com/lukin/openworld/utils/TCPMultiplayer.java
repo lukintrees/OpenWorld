@@ -18,6 +18,9 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class TCPMultiplayer implements Multiplayer{
     private static final int PORT = 12345;
@@ -57,32 +60,42 @@ public class TCPMultiplayer implements Multiplayer{
     }
 
     private Set<MultiplayerManagerThread.Device> checkHosts(String subnet, String localAddress) {
-            Set<MultiplayerManagerThread.Device> addresses = new HashSet<>();
-            int timeout=300;
-            for (int i=1;i<256;i++){
-                String host=subnet + "." + i;
-                if (!host.equals(localAddress)){
-                    Socket socket = new Socket();
-                    Gdx.app.log("TCP", "trying to connect on " + new InetSocketAddress(host, PORT));
-                    try{
-                        socket.connect(new InetSocketAddress(host, PORT), timeout);
-                        if (socket.isConnected()){
-                            OutputStream outputStream = socket.getOutputStream();
-                            outputStream.write(0x01);
-                            outputStream.write("get|name".getBytes());
-                            outputStream.write(0x04);
-                            byte[] name = new byte[128];
-                            int bytesRead = socket.getInputStream().read(name);
-                            addresses.add(new MultiplayerManagerThread.Device(host, new String(name, 1, bytesRead - 1)));
-                            break;
+        Set<MultiplayerManagerThread.Device> addresses = new HashSet<>();
+        int timeout = 300;
+        ExecutorService executor = Executors.newFixedThreadPool(255);
+        for (int i = 1; i < 256; i++) {
+            final String host = subnet + "." + i;
+            if (!host.equals(localAddress)) {
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        Socket socket = new Socket();
+                        Gdx.app.log("TCP", "trying to connect on " + new InetSocketAddress(host, PORT));
+                        try {
+                            socket.connect(new InetSocketAddress(host, PORT), timeout);
+                            if (socket.isConnected()) {
+                                OutputStream outputStream = socket.getOutputStream();
+                                outputStream.write(0x01);
+                                outputStream.write("get|name".getBytes());
+                                outputStream.write(0x04);
+                                byte[] name = new byte[128];
+                                int bytesRead = socket.getInputStream().read(name);
+                                addresses.add(new MultiplayerManagerThread.Device(host, new String(name, 1, bytesRead - 1)));
+                            }
+                        } catch (IOException e) {
+                            Gdx.app.error("TCP", "Exception: " + e.getLocalizedMessage());
                         }
-                    } catch (IOException e) {
-                        Gdx.app.error("TCP", "Exception: " + e.getLocalizedMessage());
                     }
-
-                }
+                });
             }
-            return addresses;
+        }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return addresses;
     }
 
     private static InetAddress getLocalAddress()  {
