@@ -62,10 +62,11 @@ public class MultiplayerScreen implements Screen {
                 LKGame.setScreen(LKGame.Screen.SERVER_CREATION);
             }
         });
-        stage.addActor(startServer);
-        stage.addActor(refreshButton);
         devicesList = new DeviceList();
         devicesList.setBounds(124, 6, stage.getWidth() - 124, stage.getHeight() - 6);
+        stage.addActor(startServer);
+        stage.addActor(refreshButton);
+        stage.addActor(devicesList);
         new Thread(){
             @Override
             public void run() {
