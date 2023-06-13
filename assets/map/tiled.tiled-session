@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "0x72_DungeonTilesetII_v1.tsx",
+    "activeFile": "map-3-pvp.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -16,39 +16,20 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
-        "C:/Users/vua2/AppData/Local/Temp/Temp1_OpenWorld.zip/OpenWorld/assets/map/0x72_DungeonTilesetII_v1.tsx": {
-            "scaleInDock": 1
-        },
-        "C:/Users/vua2/AppData/Local/Temp/Temp1_OpenWorld.zip/OpenWorld/assets/map/map-2-dungeon.tmx": {
-            "scale": 0.9025,
-            "selectedLayer": 0,
-            "viewCenter": {
-                "x": 400.0000000000001,
-                "y": 320.22160664819944
-            }
-        },
         "map-1-dungeon.tmx": {
-            "scale": 1.3240625,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 400.2832192589096,
-                "y": 320.2265754071277
-            }
-        },
-        "map-1.tmx": {
-            "scale": 1.3240625,
-            "selectedLayer": 0,
-            "viewCenter": {
-                "x": 400.2832192589096,
-                "y": 320.2265754071277
+                "x": 429.33333333333326,
+                "y": 319.66666666666663
             }
         },
         "map-2-dungeon.tmx": {
-            "scale": 1.3240625,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 400.2832192589096,
-                "y": 320.2265754071277
+                "x": 188,
+                "y": 408.5
             }
         },
         "map-2.tmx": {
@@ -58,9 +39,20 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 400,
-                "y": 319.5
+                "x": 287,
+                "y": -15.5
             }
+        },
+        "map-3-pvp.tmx": {
+            "scale": 2,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 159,
+                "y": 203.5
+            }
+        },
+        "map-3-pvp.tmx#0x72_DungeonTilesetII_v1.4": {
+            "scaleInDock": 2
         },
         "map.tmx": {
             "expandedObjectLayers": [
@@ -93,18 +85,18 @@
     "openFiles": [
         "0x72_DungeonTilesetII_v1.tsx",
         "map-1-dungeon.tmx",
-        "map-2-dungeon.tmx"
+        "map-2-dungeon.tmx",
+        "map-3-pvp.tmx"
     ],
     "project": "tiled.tiled-project",
-    "property.type": "int",
+    "property.type": "string",
     "recentFiles": [
-        "map-2-dungeon.tmx",
-        "map-1-dungeon.tmx",
         "0x72_DungeonTilesetII_v1.tsx",
-        "C:/Users/vua2/AppData/Local/Temp/Temp1_OpenWorld.zip/OpenWorld/assets/map/map-2-dungeon.tmx",
-        "map-2.tmx",
-        "map-1.tmx",
+        "map-1-dungeon.tmx",
+        "map-2-dungeon.tmx",
+        "map-3-pvp.tmx",
         "map.tmx",
+        "map-2.tmx",
         "map1.tmx",
         "0x72_DungeonTilesetII_v2.tsx"
     ],

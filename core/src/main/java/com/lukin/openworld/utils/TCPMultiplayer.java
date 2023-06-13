@@ -167,7 +167,7 @@ public class TCPMultiplayer implements Multiplayer{
             Socket socket;
             while (true) {
                 try {
-                    Gdx.app.log("TCP", "Listening...");
+                    Gdx.app.log("TCP", "Accpeting/ed connection...");
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
                     Gdx.app.error("TCP", "Socket's accept() method failed", e);

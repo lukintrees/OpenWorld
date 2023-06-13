@@ -5,7 +5,7 @@ import com.lukin.openworld.components.HitboxComponent;
 
 
 /**
- Класс LKEntity расширяет класс Entity для большей совместимости с {@link com.badlogic.gdx.scenes.scene2d.Actor} из Stage2d
+ Класс LKEntity расширяет класс Entity тспользуется для большей совместимости с {@link com.badlogic.gdx.scenes.scene2d.Actor} из Stage2d и мультиплеера.
  */
 public class LKEntity extends Entity {
     private static int entitySequence = 1;

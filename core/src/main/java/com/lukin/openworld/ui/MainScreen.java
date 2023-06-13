@@ -24,9 +24,9 @@ public class MainScreen implements Screen {
     private Label copyright;
     private boolean screenUsedBefore;
 
-    public MainScreen(Stage stage, BitmapFont font) {
-        this.stage = stage;
-        this.font = font;
+    public MainScreen() {
+        this.stage = LKGame.getStage();
+        this.font = LKGame.getDefaultFont();
     }
 
     @Override
@@ -78,7 +78,7 @@ public class MainScreen implements Screen {
             });
         }
         //LKGame.setMap(new TmxMapLoader().load("map/map-1.tmx"));
-        LKGame.setMap(LKGame.getAssetManager().get("map/map-" + MathUtils.random(1, 2) + ".tmx", TiledMap.class));
+        LKGame.setMap(LKGame.getMapManager().getMap(MathUtils.random(1, 2)));
         stage.addActor(gameLabel);
         stage.addActor(startButtons);
         stage.addActor(copyright);

@@ -20,6 +20,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lukin.openworld.ui.GameScreen;
 import com.lukin.openworld.ui.MainScreen;
 import com.lukin.openworld.ui.MultiplayerScreen;
+import com.lukin.openworld.ui.ServerCreationScreen;
+import com.lukin.openworld.utils.MapManager;
 import com.lukin.openworld.utils.MultiplayerManagerThread;
 import com.lukin.openworld.utils.EntityLoader;
 import com.lukin.openworld.utils.Multiplayer;
@@ -33,7 +35,7 @@ public class LKGame extends Game {
     public enum Screen{
         MAIN,
         MULTIPLAYER,
-        GAME
+        SERVER_CREATION, GAME
     }
     public static final int DEFAULT_SCREEN_WIDTH = 1280;
     public static final int DEFAULT_SCREEN_HEIGHT = 720;
@@ -51,6 +53,7 @@ public class LKGame extends Game {
     private Multiplayer multiplayer;
     private MultiplayerManagerThread multiplayerManagerThread;
     private AssetManager assetManager;
+    private MapManager mapManager;
     private static LKGame instance;
 
 
@@ -64,8 +67,8 @@ public class LKGame extends Game {
         assetManager = new AssetManager();
         assetManager.setLoader(TiledMap.class, new TmxMapLoader());
         entityLoader = new EntityLoader();
-        map = new TmxMapLoader().load("map/map-" + MathUtils.random(1, 2) + ".tmx");
-        loadAllTextures();
+        map = new TmxMapLoader().load("map/map-1-dungeon.tmx");
+        loadAllAssets();
         stage = new Stage(new FitViewport(20 * 16 * 1.78f, 20 * 16));
         Gdx.input.setInputProcessor(stage);
         engine = new Engine();
@@ -77,12 +80,12 @@ public class LKGame extends Game {
         bitmapFont = generator.generateFont(fontParameter);
         setMultiplayer(new TCPMultiplayer());
         screens = new EnumMap<>(Screen.class);
-        MainScreen mainScreen = new MainScreen(stage, bitmapFont);
+        MainScreen mainScreen = new MainScreen();
         screens.put(Screen.MAIN, mainScreen);
         setScreen(mainScreen);
     }
 
-    private void loadAllTextures() {
+    private void loadAllAssets() {
         Array<EntityLoader.EntityJson> entities = entityLoader.getEntities();
         Array<EntityLoader.WeaponJson> weapons = entityLoader.getWeapons();
         for (EntityLoader.EntityJson entity : entities) {
@@ -99,19 +102,14 @@ public class LKGame extends Game {
                 }
             }
         }
-        for (int i = 1; i < 3; i++) {
-            assetManager.load("map/map-" + i + ".tmx", TiledMap.class);
-        }
+        mapManager = new MapManager();
         assetManager.load("JoystickR.png", Texture.class);
         assetManager.load("KnobR.png", Texture.class);
+        assetManager.load("popular_icons/play.png", Texture.class);
         assetManager.update();
         assetManager.finishLoading();
     }
 
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height);
-    }
     public static void setScreen(Screen screen) {
         Gdx.app.postRunnable(new Runnable() {
             @Override
@@ -119,7 +117,7 @@ public class LKGame extends Game {
                 LKGame game = getInstance();
                 if (screen == Screen.MAIN) {
                     if (game.screens.get(Screen.MAIN) == null) {
-                        game.screens.put(Screen.MAIN, new MainScreen(game.stage, game.bitmapFont));
+                        game.screens.put(Screen.MAIN, new MainScreen());
                     }
                     game.setScreen(game.screens.get(Screen.MAIN));
                 } else if (screen == Screen.GAME) {
@@ -132,6 +130,11 @@ public class LKGame extends Game {
                         game.screens.put(Screen.MULTIPLAYER, new MultiplayerScreen());
                     }
                     game.setScreen(game.screens.get(Screen.MULTIPLAYER));
+                } else if (screen == Screen.SERVER_CREATION){
+                    if (game.screens.get(Screen.SERVER_CREATION) == null) {
+                        game.screens.put(Screen.SERVER_CREATION, new ServerCreationScreen());
+                    }
+                    game.setScreen(game.screens.get(Screen.SERVER_CREATION));
                 }
             }
         });
@@ -145,10 +148,11 @@ public class LKGame extends Game {
         LKGame game = getInstance();
         game.screens.remove(screen);
     }
-    public void setMultiplayer(Multiplayer multiplayer) {
-        this.multiplayer = multiplayer;
-        this.multiplayerManagerThread = new MultiplayerManagerThread(multiplayer);
-        multiplayerManagerThread.start();
+    public static void setMultiplayer(Multiplayer multiplayer) {
+        LKGame game = getInstance();
+        game.multiplayer = multiplayer;
+        game.multiplayerManagerThread = new MultiplayerManagerThread(multiplayer);
+        game.multiplayerManagerThread.start();
     }
     public static MultiplayerManagerThread getMultiplayerManagerThread() {
         return getInstance().multiplayerManagerThread;
@@ -188,6 +192,9 @@ public class LKGame extends Game {
     }
     public static AssetManager getAssetManager() {
         return getInstance().assetManager;
+    }
+    public static MapManager getMapManager() {
+        return getInstance().mapManager;
     }
 
     public static void setMap(TiledMap map){

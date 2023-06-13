@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -16,19 +15,24 @@ import com.lukin.openworld.components.EntityComponent;
 import com.lukin.openworld.components.HitboxComponent;
 import com.lukin.openworld.components.SwordComponent;
 import com.lukin.openworld.entities.Enemy;
+import com.lukin.openworld.entities.LKEntity;
 import com.lukin.openworld.entities.LocalPlayer;
+import com.lukin.openworld.ui.GameScreen;
+import com.lukin.openworld.utils.Mode;
 
 public class AttackSystem extends EntitySystem implements EntityListener {
     private final Array<Entity> damageEntities;
     private final Array<Entity> entities;
     private final TiledMapTileLayer collisionLayer;
     private final boolean isServer;
+    private final Mode gameMode;
 
-    public AttackSystem(boolean isServer) {
+    public AttackSystem(boolean isServer, Mode gameMode) {
         damageEntities = new Array<>();
         entities = new Array<>();
         collisionLayer = (TiledMapTileLayer) LKGame.getMap().getLayers().get("collision");
         this.isServer = isServer;
+        this.gameMode = gameMode;
     }
 
     @Override
@@ -52,14 +56,12 @@ public class AttackSystem extends EntitySystem implements EntityListener {
                         if (entity instanceof LocalPlayer){
                             Gdx.input.vibrate(200);
                         }
-
                         EntityComponent entityComponent = entity.getComponent(EntityComponent.class);
                         entityComponent.health -= bulletComponent.damage;
                         if (entityComponent.health <= 0) {
                             getEngine().removeEntity(entity);
-                            if (entity instanceof LocalPlayer){
-                                LKGame.setScreen(LKGame.Screen.MAIN);
-                                return;
+                            if (gameMode != null){
+                                gameMode.onKill(bulletComponent.owner, (LKEntity) entity);
                             }
                         }
                         getEngine().removeEntity(damageEntity);
@@ -100,7 +102,7 @@ public class AttackSystem extends EntitySystem implements EntityListener {
             damageEntities.add(entity);
             return;
         }
-        if (entity.getComponent(EntityComponent.class)!= null) {
+        if (entity.getComponent(EntityComponent.class) != null) {
             entities.add(entity);
         }
     }
@@ -111,8 +113,15 @@ public class AttackSystem extends EntitySystem implements EntityListener {
             damageEntities.removeValue(entity, true);
             return;
         }
-        if (entity.getComponent(EntityComponent.class)!= null) {
+        if (entity.getComponent(EntityComponent.class) != null) {
             entities.removeValue(entity, true);
+            if (entity instanceof LocalPlayer && gameMode != null){
+                if (gameMode.is(GameScreen.GameMode.PVP)){
+                    ((GameScreen) LKGame.getScreens().get(LKGame.Screen.GAME)).createLocalPlayer();
+                }else if (gameMode.is(GameScreen.GameMode.DUNGEON)){
+                    LKGame.setScreen(LKGame.Screen.MAIN);
+                }
+            }
         }
     }
 }

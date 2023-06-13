@@ -13,7 +13,7 @@ import com.lukin.openworld.utils.MultiplayerManagerThread;
 import java.util.Set;
 
 public class DeviceList extends Actor {
-    private Stage stage;
+    private final Stage stage;
     private Label[] deviceLabels;
 
     public DeviceList() {
@@ -28,7 +28,7 @@ public class DeviceList extends Actor {
         int i = 0; // начинаем с первого устройства
         for (MultiplayerManagerThread.Device device : pairedDevices) {
             Label label = new Label(device.name + " (" + device.address + ")", labelStyle);
-            label.setPosition(getX(), y - label.getHeight()); // устанавливаем позицию метки с учетом ее высоты
+            label.setPosition(getX(), y - label.getHeight() - 10); // устанавливаем позицию метки с учетом ее высоты
             label.addListener(new ClickListener(){
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {

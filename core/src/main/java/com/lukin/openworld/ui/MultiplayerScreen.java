@@ -17,7 +17,6 @@ import com.lukin.openworld.LKGame;
 import com.lukin.openworld.utils.MultiplayerManagerThread;
 
 public class MultiplayerScreen implements Screen {
-    private MultiplayerManagerThread multiplayerManagerThread;
     private Stage stage;
     private DeviceList devicesList;
     private HorizontalGroup refreshButton;
@@ -28,7 +27,7 @@ public class MultiplayerScreen implements Screen {
 
     @Override
     public void show() {
-        multiplayerManagerThread = LKGame.getMultiplayerManagerThread();
+        MultiplayerManagerThread multiplayerManagerThread = LKGame.getMultiplayerManagerThread();
         refreshButton = new HorizontalGroup();
         refreshButton.setTouchable(Touchable.enabled);
         Image reloadImage = new Image(new Texture(Gdx.files.internal("popular_icons/reload.png")));
@@ -60,9 +59,7 @@ public class MultiplayerScreen implements Screen {
         startServer.addListener(new ClickListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                LKGame.getMultiplayer().startListeningForClientConnections();
-                LKGame.getMultiplayerManagerThread().setServer(true);
-                LKGame.setScreen(LKGame.Screen.GAME);
+                LKGame.setScreen(LKGame.Screen.SERVER_CREATION);
             }
         });
         stage.addActor(startServer);

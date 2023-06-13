@@ -13,12 +13,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lukin.openworld.LKGame;
@@ -31,7 +30,8 @@ import com.lukin.openworld.systems.EnemySpawnSystem;
 import com.lukin.openworld.systems.EnemySystem;
 import com.lukin.openworld.systems.EntitiyRenderSystem;
 import com.lukin.openworld.systems.LocalPlayerSystem;
-import com.lukin.openworld.utils.EntityLoader;
+import com.lukin.openworld.utils.MapManager;
+import com.lukin.openworld.utils.Mode;
 import com.lukin.openworld.utils.MultiplayerManagerThread;
 
 public class GameScreen implements Screen {
@@ -47,11 +47,16 @@ public class GameScreen implements Screen {
     private Touchpad touchpad;
     private Touchpad shootTouchpad;
     private HealthBar healthBar;
+    private PvPScoreBar pvpScoreBar;
     private MultiplayerManagerThread multiplayerManagerThread;
     private boolean isServer = true;
+    private int playerCount;
+    private GameMode modeEnum;
+    private Mode gameMode;
+    private float time;
     private boolean isMultiplayer;
     private boolean firstResize;
-
+    private InputComponent inputComponent;
 
     public GameScreen() {
         this.batch = LKGame.getBatch();
@@ -59,6 +64,13 @@ public class GameScreen implements Screen {
         this.viewport = LKGame.getViewport();
         this.engine = LKGame.getEngine();
         this.assetManager = LKGame.getAssetManager();
+    }
+
+    public GameScreen(Mode gameMode, int playerCount, float time){
+        this();
+        this.gameMode = gameMode;
+        this.playerCount = playerCount - 1;
+        this.time = time;
     }
 
     @Override
@@ -75,11 +87,19 @@ public class GameScreen implements Screen {
             wallLayer = (TiledMapTileLayer) map.getLayers().get("walls");
             multiplayerManagerThread = LKGame.getMultiplayerManagerThread();
             isMultiplayer = multiplayerManagerThread.isMultiplayer();
+            MapManager.MapProperty mapProperty = LKGame.getMapManager().getMapProperty(map);
+            modeEnum = mapProperty.getMode();
             firstResize = true;
             loadAshleySystems();
-            InputComponent inputComponent = loadUIButtons();
-            LocalPlayer player = loadBasicEntities(inputComponent);
+            this.inputComponent = loadUIButtons();
+            LocalPlayer player = loadLocalPlayer();
             loadLocalPlayerUI(player);
+            if (modeEnum == GameMode.PVP){
+                pvpScoreBar = new PvPScoreBar();
+                pvpScoreBar.setSize(stage.getWidth() / 3f, stage.getHeight() / 12f);
+                pvpScoreBar.setPosition(healthBar.getX() + healthBar.getWidth() + 70, stage.getHeight() - pvpScoreBar.getHeight());
+                stage.addActor(pvpScoreBar);
+            }
             stage.addActor(touchpad);
             stage.addActor(shootTouchpad);
             stage.addActor(healthBar);
@@ -90,21 +110,31 @@ public class GameScreen implements Screen {
         ScreenUtils.clear(0, 0, 0, 0);
         batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
+        if(mapRenderer == null){
+            this.mapRenderer = new OrthogonalTiledMapRenderer(map, batch);
+        }
         mapRenderer.renderTileLayer(backgroundLayer);
         mapRenderer.renderTileLayer(wallLayer);
-        engine.update(Gdx.graphics.getDeltaTime());
+        engine.update(delta);
         batch.end();
         stage.act();
         stage.draw();
         if (isMultiplayer){
             multiplayerManagerThread.act();
+            if (modeEnum == GameMode.PVP){
+                time -= delta;
+                pvpScoreBar.setTime(time);
+                if (time <= 0){
+                    LKGame.setScreen(LKGame.Screen.MAIN);
+                }
+            }
         }
     }
 
     @Override
     public void resize(int width, int height) {
-        //Из-за особенностей libgdx при переключении экранов, если загружать на этот экран из другово потоко,
-        //то на компьютере будет вылетать,тк нельзя запускать gl команды в другом потоке, а на телефоне используется gl es, поэтому можно(хоть и с непредвиденным резултатом)
+        //Из-за особенностей libgdx при переключении экранов, если загружать на этот экран из другово потока,
+        //то на компьютере будет вылетать,тк нельзя запускать gl команды в другом потоке, а на телефоне используется gl es, поэтому можно(хоть и с непредвиденным результатом)
         if (firstResize){
             Gdx.app.postRunnable(new Runnable() {
                 @Override
@@ -122,7 +152,7 @@ public class GameScreen implements Screen {
 
     private void loadAshleySystems(){
         if (isServer){
-            LocalPlayerSystem localPlayerSystem = new LocalPlayerSystem((OrthographicCamera) viewport.getCamera());
+            LocalPlayerSystem localPlayerSystem = new LocalPlayerSystem((OrthographicCamera) viewport.getCamera(), modeEnum);
             engine.addSystem(localPlayerSystem);
             engine.addEntityListener(localPlayerSystem);
             EnemySystem enemySystem = new EnemySystem();
@@ -131,20 +161,25 @@ public class GameScreen implements Screen {
             EntitiyRenderSystem entitiyRenderSystem = new EntitiyRenderSystem();
             engine.addSystem(entitiyRenderSystem);
             engine.addEntityListener(entitiyRenderSystem);
-            AttackSystem attackSystem = new AttackSystem(isServer);
+            AttackSystem attackSystem = new AttackSystem(isServer, gameMode);
             engine.addSystem(attackSystem);
             engine.addEntityListener(attackSystem);
             AttackRenderSystem attackRenderSystem = new AttackRenderSystem();
             engine.addSystem(attackRenderSystem);
             engine.addEntityListener(attackRenderSystem);
-            EnemySpawnSystem enemySpawnSystem = new EnemySpawnSystem();
-            engine.addSystem(enemySpawnSystem);
-            engine.addEntityListener(enemySpawnSystem);
+            if (gameMode != null && isServer){
+                engine.addEntityListener(gameMode);
+            }
+            if (modeEnum == GameMode.DUNGEON){
+                EnemySpawnSystem enemySpawnSystem = new EnemySpawnSystem();
+                engine.addSystem(enemySpawnSystem);
+                engine.addEntityListener(enemySpawnSystem);
+            }
         }else{
-            LocalPlayerSystem localPlayerSystem = new LocalPlayerSystem((OrthographicCamera) viewport.getCamera());
+            LocalPlayerSystem localPlayerSystem = new LocalPlayerSystem((OrthographicCamera) viewport.getCamera(), modeEnum);
             engine.addSystem(localPlayerSystem);
             engine.addEntityListener(localPlayerSystem);
-            AttackSystem attackSystem = new AttackSystem(isServer);
+            AttackSystem attackSystem = new AttackSystem(isServer, gameMode);
             engine.addSystem(attackSystem);
             engine.addEntityListener(attackSystem);
             EntitiyRenderSystem entitiyRenderSystem = new EntitiyRenderSystem();
@@ -174,17 +209,37 @@ public class GameScreen implements Screen {
         inputComponent.shootTouchpad.setPosition(touchpadPos.x + stage.getWidth() / 1.37f, touchpadPos.y + 10);
         return inputComponent;
     }
-    private LocalPlayer loadBasicEntities(InputComponent inputComponent){
-        LocalPlayer localPlayer = new LocalPlayer(MathUtils.randomBoolean() ? 1 : 5
-                , 2, inputComponent);
-        localPlayer.setBounds(map.getProperties().get("spawnX", Integer.class) * 16, (40 - map.getProperties().get("spawnY", Integer.class)) * 16, 16, 16);
+
+    public void createLocalPlayer(){
+        LocalPlayer localPlayer = loadLocalPlayer();
+        if(healthBar != null) {
+            healthBar.setVisible(false);
+            healthBar.remove();
+        }
+        loadLocalPlayerUI(localPlayer);
+    }
+
+    private LocalPlayer loadLocalPlayer(){
+        LocalPlayer localPlayer = new LocalPlayer(1, 2, inputComponent);
+        if (modeEnum == GameMode.PVP){
+            MapManager.MapProperty mapProperty = LKGame.getMapManager().getMapProperty(map);
+            Vector2 spawnPosition;
+            if (isServer){
+                spawnPosition = mapProperty.getPlayerSpawns()[0];
+            }else{
+                spawnPosition = mapProperty.getPlayerSpawns()[playerCount];
+            }
+            localPlayer.setBounds(spawnPosition.x, spawnPosition.y, 16, 16);
+        }else {
+            localPlayer.setBounds(map.getProperties().get("spawnX", Integer.class) * 16, (backgroundLayer.getHeight() - map.getProperties().get("spawnY", Integer.class)) * 16, 16, 16);
+        }
         engine.addEntity(localPlayer);
         return localPlayer;
     }
 
     private void loadLocalPlayerUI(LocalPlayer localPlayer){
         healthBar = new HealthBar(localPlayer.getComponent(EntityComponent.class));
-        healthBar.setBounds(10, stage.getHeight() - stage.getHeight() / 15, stage.getWidth() / 3f, stage.getHeight() / 2f);
+        healthBar.setBounds(10, stage.getHeight() - 30, stage.getWidth() / 3f, stage.getHeight() / 12f);
         stage.addActor(healthBar);
     }
 
@@ -212,5 +267,14 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+    }
+
+    public float getTime() {
+        return time;
+    }
+
+    public enum GameMode {
+        DUNGEON,
+        PVP
     }
 }

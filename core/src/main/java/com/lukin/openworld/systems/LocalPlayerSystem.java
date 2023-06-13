@@ -20,19 +20,23 @@ import com.lukin.openworld.components.InputComponent;
 import com.lukin.openworld.components.WeaponPlayerComponent;
 import com.lukin.openworld.entities.Bullet;
 import com.lukin.openworld.entities.LKEntity;
+import com.lukin.openworld.ui.GameScreen;
 
 public class LocalPlayerSystem extends EntitySystem implements EntityListener {
     private LKEntity localPlayer;
     private final TiledMap map;
     private final OrthographicCamera camera;
+    private final GameScreen.GameMode gameMode;
     private static final int SPEED_RATIO = 100;
     private boolean fistPlayerLoad;
-    private final Vector2 levelExitPosition;
+    private Vector2 levelExitPosition;
 
-    public LocalPlayerSystem(OrthographicCamera camera) {
+    public LocalPlayerSystem(OrthographicCamera camera, GameScreen.GameMode gameMode) {
         this.camera = camera;
         map = LKGame.getMap();
-        levelExitPosition = new Vector2(map.getProperties().get("exitX", Integer.class) * 16,
+        this.gameMode = gameMode;
+        if(gameMode == GameScreen.GameMode.DUNGEON)
+            levelExitPosition = new Vector2(map.getProperties().get("exitX", Integer.class) * 16,
                 (map.getProperties().get("height", Integer.class) - map.getProperties().get("exitY", Integer.class)) * 16);
     }
 
@@ -43,7 +47,8 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
             checkWalkTouchpad(deltaTime);
             setWeaponRotation();
             checkShootTouchpad();
-            checkExit();
+            if(gameMode == GameScreen.GameMode.DUNGEON)
+                checkExit();
         }
     }
 
