@@ -268,6 +268,9 @@ public class GameScreen implements Screen {
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         engine.removeAllSystems();
         engine.removeAllEntities();
+        if(isServer && isMultiplayer){
+            LKGame.getMultiplayer().stopListeningForClientConnections();
+        }
     }
 
     @Override

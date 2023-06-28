@@ -28,7 +28,8 @@ public class TCPMultiplayer implements Multiplayer{
     private static final int PORT = 12345;
     private final LKGame game;
     private ServerConnectThread serverConnectThread;
-    
+    private Server server;
+
 
     public TCPMultiplayer() {
         game = LKGame.getInstance();
@@ -140,7 +141,7 @@ public class TCPMultiplayer implements Multiplayer{
     @Override
     public void startListeningForClientConnections() {
         Gdx.app.log("TCP", "Listening required");
-        Server server = new Server();
+        server = new Server();
         try {
             server.bind(12347, 12346);
             server.start();
@@ -153,6 +154,7 @@ public class TCPMultiplayer implements Multiplayer{
     @Override
     public boolean stopListeningForClientConnections() {
         serverConnectThread.cancel();
+        server.close();
         return true;
     }
 
@@ -190,7 +192,6 @@ public class TCPMultiplayer implements Multiplayer{
             }
         }
 
-        // Closes the connect socket and causes the thread to finish.
         public void cancel() {
             try {
                 mmServerSocket.close();

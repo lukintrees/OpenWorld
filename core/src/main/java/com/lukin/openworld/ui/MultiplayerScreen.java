@@ -27,7 +27,6 @@ public class MultiplayerScreen implements Screen {
 
     @Override
     public void show() {
-        MultiplayerManagerThread multiplayerManagerThread = LKGame.getMultiplayerManagerThread();
         refreshButton = new HorizontalGroup();
         refreshButton.setTouchable(Touchable.enabled);
         Image reloadImage = new Image(new Texture(Gdx.files.internal("popular_icons/reload.png")));

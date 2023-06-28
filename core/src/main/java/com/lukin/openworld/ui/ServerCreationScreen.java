@@ -121,6 +121,7 @@ public class ServerCreationScreen implements Screen {
             createButton.addListener(new ClickListener(){
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    super.touchUp(event, x, y, pointer, button);
                     LKGame.setMap(LKGame.getMapManager().getRandomMap(GameScreen.GameMode.valueOf(modeLabel.getText().toString())));
                     LKGame.getMultiplayer().startListeningForClientConnections();
                     LKGame.getMultiplayerManagerThread().onServerStart(Integer.parseInt(timeLabel.getText().toString().split(" ")[0]) * 60);
