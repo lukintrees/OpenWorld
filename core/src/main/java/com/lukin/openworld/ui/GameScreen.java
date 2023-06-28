@@ -282,7 +282,16 @@ public class GameScreen implements Screen {
     }
 
     public enum GameMode {
-        DUNGEON,
-        PVP
+        DUNGEON("Подземелья"),
+        PVP("Игрок против игрока");
+
+        private final String translation;
+        GameMode(String translation){
+            this.translation = translation;
+        }
+
+        public String getTranslation(){
+            return translation;
+        }
     }
 }

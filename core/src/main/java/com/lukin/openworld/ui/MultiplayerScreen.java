@@ -54,7 +54,8 @@ public class MultiplayerScreen implements Screen {
         };
         reloadText.addListener(clickListener);
         reloadImage.addListener(clickListener);
-        Label startServer = new Label("Start Server", new Label.LabelStyle(LKGame.getDefaultFont(), Color.WHITE));
+        Label startServer = new Label("Создать сервер", new Label.LabelStyle(LKGame.getDefaultFont(), Color.WHITE));
+        startServer.setPosition(10, 5);
         startServer.addListener(new ClickListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {

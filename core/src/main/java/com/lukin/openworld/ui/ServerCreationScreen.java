@@ -33,7 +33,7 @@ public class ServerCreationScreen implements Screen {
         modeStrings = new Array<>(Arrays.stream(GameScreen.GameMode.values()).map(new Function<GameScreen.GameMode, String>() {
             @Override
             public String apply(GameScreen.GameMode gameMode) {
-                return gameMode.toString();
+                return gameMode.getTranslation();
             }
         }).toArray(String[]::new));
         timesInMinutes = new Array<>(new String[]{"1 минута", "2 минуты", "3 минуты", "5 минут", "10 минут", "15 минут"});

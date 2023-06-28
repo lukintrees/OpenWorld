@@ -46,7 +46,7 @@ public class MainScreen implements Screen {
             Label startButton = new Label("Начать приключение", labelStyle);
             startButtons.add(startButton).padRight(50);
 
-            Label multiplayerButton = new Label("Мультиплеер", labelStyle);
+            Label multiplayerButton = new Label("Сетевая игра", labelStyle);
             startButtons.add(multiplayerButton);
 
             startButtons.setPosition(stage.getWidth() / 2f - startButtons.getWidth() / 2f, 100);
