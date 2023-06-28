@@ -225,7 +225,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 outputStream.write(data.getBytes(StandardCharsets.UTF_8));
                 outputStream.write(0x04);
             } catch (IOException e) {
-                Gdx.app.error("TCP", new String(data), e);
+                Gdx.app.error("TCP", data, e);
                 //devices.remove(device);
             }
         }

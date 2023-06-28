@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lukin.openworld.LKGame;
@@ -33,6 +34,7 @@ import com.lukin.openworld.systems.LocalPlayerSystem;
 import com.lukin.openworld.utils.MapManager;
 import com.lukin.openworld.utils.Mode;
 import com.lukin.openworld.utils.MultiplayerManagerThread;
+import com.lukin.openworld.utils.PvPMode;
 
 public class GameScreen implements Screen {
     private final SpriteBatch batch;
@@ -91,7 +93,7 @@ public class GameScreen implements Screen {
             modeEnum = mapProperty.getMode();
             firstResize = true;
             loadAshleySystems();
-            this.inputComponent = loadUIButtons();
+            loadUIButtons();
             LocalPlayer player = loadLocalPlayer();
             loadLocalPlayerUI(player);
             if (modeEnum == GameMode.PVP){
@@ -125,7 +127,11 @@ public class GameScreen implements Screen {
                 time -= delta;
                 pvpScoreBar.setTime(time);
                 if (time <= 0){
-                    LKGame.setScreen(LKGame.Screen.MAIN);
+                    Array<PvPMode.Team> teams = ((PvPMode) gameMode).getTeams();
+                    String win;
+                    win = isServer == (teams.get(0).score > teams.get(1).score) ? "Выиграл" : "Проиграл";
+                    LKGame.getScreens().put(LKGame.Screen.RESULT, new ResultScreen(win, "время закончилось", gameMode));
+                    LKGame.setScreen(LKGame.Screen.RESULT);
                 }
             }
         }
@@ -134,7 +140,7 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         //Из-за особенностей libgdx при переключении экранов, если загружать на этот экран из другово потока,
-        //то на компьютере будет вылетать,тк нельзя запускать gl команды в другом потоке, а на телефоне используется gl es, поэтому можно(хоть и с непредвиденным результатом)
+        //то на компьютере будет вылетать,тк нельзя запускать GL команды в другом потоке, а на телефоне используется GL ES, поэтому можно(хоть и с непредвиденным результатом)
         if (firstResize){
             Gdx.app.postRunnable(new Runnable() {
                 @Override
@@ -167,7 +173,7 @@ public class GameScreen implements Screen {
             AttackRenderSystem attackRenderSystem = new AttackRenderSystem();
             engine.addSystem(attackRenderSystem);
             engine.addEntityListener(attackRenderSystem);
-            if (gameMode != null && isServer){
+            if (gameMode != null){
                 engine.addEntityListener(gameMode);
             }
             if (modeEnum == GameMode.DUNGEON){
@@ -194,20 +200,19 @@ public class GameScreen implements Screen {
         }
     }
 
-    private InputComponent loadUIButtons(){
+    private void loadUIButtons(){
         Texture joystickBackground = assetManager.get("JoystickR.png", Texture.class);
         Texture joystickKnob = assetManager.get("KnobR.png", Texture.class);
         touchpad = new Touchpad(10, new Touchpad.TouchpadStyle(new TextureRegionDrawable(joystickBackground), new TextureRegionDrawable(joystickKnob)));
         shootTouchpad = new Touchpad(20, new Touchpad.TouchpadStyle(new TextureRegionDrawable(joystickBackground), new TextureRegionDrawable(joystickKnob)));
         stage.addActor(touchpad);
         stage.addActor(shootTouchpad);
-        InputComponent inputComponent = new InputComponent();
+        inputComponent = new InputComponent();
         inputComponent.shootTouchpad = shootTouchpad;
         inputComponent.touchpad = touchpad;
         Vector3 touchpadPos = stage.getCamera().unproject(new Vector3(0, Gdx.graphics.getHeight(), 0));
         inputComponent.touchpad.setPosition(touchpadPos.x+10, touchpadPos.y+10);
         inputComponent.shootTouchpad.setPosition(touchpadPos.x + stage.getWidth() / 1.37f, touchpadPos.y + 10);
-        return inputComponent;
     }
 
     public void createLocalPlayer(){

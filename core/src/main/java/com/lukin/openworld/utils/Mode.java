@@ -6,6 +6,7 @@ import com.lukin.openworld.ui.GameScreen;
 
 public interface Mode extends EntityListener {
     void onKill(LKEntity killer, LKEntity victim);
+    GameScreen.GameMode getMode();
     boolean is(GameScreen.GameMode modeEnum);
     String serialize();
 

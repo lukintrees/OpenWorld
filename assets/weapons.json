@@ -3,12 +3,14 @@
     "id": 1,
     "name": "Basic Knife",
     "texture": "tile:51",
-    "bullet_texture": "false"
+    "bullet_texture": "false",
+    "delay_from_attack": 0.3
   },
   {
     "id": 2,
     "name": "kalash",
     "texture": "tiles:690-691",
-    "bullet_texture": "tile:692"
+    "bullet_texture": "tile:692",
+    "delay_from_attack": 0.3
   }
 ]

@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class MapManager {
-    private MapEntry[] maps;
+    private final MapEntry[] maps;
 
     public MapManager() {
         AssetManager assetManager = LKGame.getAssetManager();
@@ -102,8 +102,8 @@ public class MapManager {
     }
 
     public static class MapEntry {
-        private TiledMap map;
-        private MapProperty property;
+        private final TiledMap map;
+        private final MapProperty property;
 
         public MapEntry(TiledMap map, MapProperty property) {
             this.map = map;
@@ -120,8 +120,8 @@ public class MapManager {
     }
 
     public static class MapProperty {
-        private GameScreen.GameMode mode;
-        private Vector2[] playerSpawns;
+        private final GameScreen.GameMode mode;
+        private final Vector2[] playerSpawns;
 
         public MapProperty(GameScreen.GameMode mode, Vector2[] playerSpawns) {
             this.mode = mode;

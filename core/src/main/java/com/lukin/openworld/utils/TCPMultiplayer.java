@@ -1,6 +1,8 @@
 package com.lukin.openworld.utils;
 
 import com.badlogic.gdx.Gdx;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Server;
 import com.lukin.openworld.LKGame;
 
 import java.io.ByteArrayOutputStream;
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TCPMultiplayer implements Multiplayer{
     private static final int PORT = 12345;
-    private LKGame game;
+    private final LKGame game;
     private ServerConnectThread serverConnectThread;
     
 
@@ -51,12 +53,13 @@ public class TCPMultiplayer implements Multiplayer{
 
     @Override
     public Set<MultiplayerManagerThread.Device> getPairedConnections() {
-        InetAddress address = getLocalAddress();
-        if (address != null){
-            String subnet = address.toString().substring(1, address.toString().lastIndexOf("."));
-            return checkHosts(subnet, address.toString().substring(1));
+        Client client = new Client();
+        List<InetAddress> inetAddresses = client.discoverHosts(12346, 3000);
+        HashSet<MultiplayerManagerThread.Device> devices = new HashSet();
+        for(InetAddress inetAddress : inetAddresses){
+            devices.add(new MultiplayerManagerThread.Device(inetAddress.getHostAddress(), "Сервер"));
         }
-        return new HashSet<>();
+        return devices;
     }
 
     private Set<MultiplayerManagerThread.Device> checkHosts(String subnet, String localAddress) {
@@ -137,6 +140,12 @@ public class TCPMultiplayer implements Multiplayer{
     @Override
     public void startListeningForClientConnections() {
         Gdx.app.log("TCP", "Listening required");
+        Server server = new Server();
+        try {
+            server.bind(12347, 12346);
+            server.start();
+        } catch (IOException ignored) {
+        }
         serverConnectThread = new ServerConnectThread();
         serverConnectThread.start();
     }

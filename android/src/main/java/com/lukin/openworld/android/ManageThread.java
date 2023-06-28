@@ -6,6 +6,8 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
+
+import com.lukin.openworld.LKGame;
 import com.lukin.openworld.utils.MultiplayerManagerThread;
 
 import java.io.IOException;
@@ -22,7 +24,7 @@ public class ManageThread extends Thread{
 
     public ManageThread(BluetoothSocket socket, BluetoothAndroid bluetoothAndroid) {
         mmSocket = socket;
-        bluetoothManagerThread = bluetoothAndroid.game.getMultiplayerManagerThread();
+        bluetoothManagerThread = LKGame.getMultiplayerManagerThread();
         BluetoothDevice bluetoothDevice = socket.getRemoteDevice();
         this.device = new MultiplayerManagerThread.Device(bluetoothDevice.getAddress(), bluetoothDevice.getName());
         InputStream tmpIn = null;

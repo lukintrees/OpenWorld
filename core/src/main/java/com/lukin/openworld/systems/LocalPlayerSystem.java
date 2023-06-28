@@ -21,6 +21,7 @@ import com.lukin.openworld.components.WeaponPlayerComponent;
 import com.lukin.openworld.entities.Bullet;
 import com.lukin.openworld.entities.LKEntity;
 import com.lukin.openworld.ui.GameScreen;
+import com.lukin.openworld.ui.ResultScreen;
 
 public class LocalPlayerSystem extends EntitySystem implements EntityListener {
     private LKEntity localPlayer;
@@ -54,7 +55,8 @@ public class LocalPlayerSystem extends EntitySystem implements EntityListener {
 
     public void checkExit(){
         if (levelExitPosition.dst2(localPlayer.getComponent(HitboxComponent.class).getPosition()) < 625){
-            LKGame.setScreen(LKGame.Screen.MAIN);
+            LKGame.getScreens().put(LKGame.Screen.RESULT, new ResultScreen("Выиграл", "достигнут выход", null));
+            LKGame.setScreen(LKGame.Screen.RESULT);
         }
     }
 

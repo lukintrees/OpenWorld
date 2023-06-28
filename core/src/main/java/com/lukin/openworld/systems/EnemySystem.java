@@ -28,7 +28,7 @@ import com.lukin.openworld.entities.Bullet;
 import com.lukin.openworld.entities.LKEntity;
 
 public class EnemySystem extends EntitySystem implements EntityListener {
-    private Array<Entity> entities;
+    private final Array<Entity> entities;
     private final LKPathFinder pathFinder;
     private final Array<Entity> players;
     private final LKRaycastCollisionDetector collisionDetector;
@@ -146,7 +146,7 @@ public class EnemySystem extends EntitySystem implements EntityListener {
         bulletComponent.textureRotation = angle * MathUtils.radiansToDegrees;
         bulletComponent.owner = (LKEntity) owner;
         getEngine().addEntity(bullet);
-        weaponPlayerComponent.delayFromAttack = weaponPlayerComponent.delayFromAttackBasic + MathUtils.random(0.2f);
+        weaponPlayerComponent.delayFromAttack = weaponPlayerComponent.delayFromAttackBasic + MathUtils.random(0.1f, 0.4f);
     }
 
     private void setWeaponRotation(Entity owner, HitboxComponent ownerHitbox, HitboxComponent targetHitbox, WeaponPlayerComponent weapon){

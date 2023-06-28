@@ -18,6 +18,7 @@ import com.lukin.openworld.entities.Enemy;
 import com.lukin.openworld.entities.LKEntity;
 import com.lukin.openworld.entities.LocalPlayer;
 import com.lukin.openworld.ui.GameScreen;
+import com.lukin.openworld.ui.ResultScreen;
 import com.lukin.openworld.utils.Mode;
 
 public class AttackSystem extends EntitySystem implements EntityListener {
@@ -115,11 +116,12 @@ public class AttackSystem extends EntitySystem implements EntityListener {
         }
         if (entity.getComponent(EntityComponent.class) != null) {
             entities.removeValue(entity, true);
-            if (entity instanceof LocalPlayer && gameMode != null){
-                if (gameMode.is(GameScreen.GameMode.PVP)){
+            if (entity instanceof LocalPlayer){
+                if (gameMode != null && gameMode.is(GameScreen.GameMode.PVP)){
                     ((GameScreen) LKGame.getScreens().get(LKGame.Screen.GAME)).createLocalPlayer();
-                }else if (gameMode.is(GameScreen.GameMode.DUNGEON)){
-                    LKGame.setScreen(LKGame.Screen.MAIN);
+                }else if (gameMode == null && entity.getComponent(EntityComponent.class).health <= 0){
+                    LKGame.getScreens().put(LKGame.Screen.RESULT, new ResultScreen("Проиграл", "ты умер", gameMode));
+                    LKGame.setScreen(LKGame.Screen.RESULT);
                 }
             }
         }

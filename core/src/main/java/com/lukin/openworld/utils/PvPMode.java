@@ -84,6 +84,11 @@ public class PvPMode implements Mode {
         }
     }
 
+    @Override
+    public GameScreen.GameMode getMode() {
+        return GameScreen.GameMode.PVP;
+    }
+
     private void updateUI(){
         for (Actor actor : LKGame.getStage().getActors()){
             if (actor instanceof PvPScoreBar){

@@ -17,7 +17,7 @@ import com.lukin.openworld.LKGame;
 import com.lukin.openworld.utils.MultiplayerManagerThread;
 
 public class MultiplayerScreen implements Screen {
-    private Stage stage;
+    private final Stage stage;
     private DeviceList devicesList;
     private HorizontalGroup refreshButton;
 

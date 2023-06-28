@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lukin.openworld.ui.GameScreen;
 import com.lukin.openworld.ui.MainScreen;
 import com.lukin.openworld.ui.MultiplayerScreen;
+import com.lukin.openworld.ui.ResultScreen;
 import com.lukin.openworld.ui.ServerCreationScreen;
 import com.lukin.openworld.utils.MapManager;
 import com.lukin.openworld.utils.MultiplayerManagerThread;
@@ -32,11 +33,6 @@ import java.util.Map;
 
 
 public class LKGame extends Game {
-    public enum Screen{
-        MAIN,
-        MULTIPLAYER,
-        SERVER_CREATION, GAME
-    }
     public static final int DEFAULT_SCREEN_WIDTH = 1280;
     public static final int DEFAULT_SCREEN_HEIGHT = 720;
     public static final String DEFAULT_CHARS_FOR_FONT = FreeTypeFontGenerator.DEFAULT_CHARS + "АБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуүфхцчшщъыьэюя";
@@ -135,6 +131,12 @@ public class LKGame extends Game {
                         game.screens.put(Screen.SERVER_CREATION, new ServerCreationScreen());
                     }
                     game.setScreen(game.screens.get(Screen.SERVER_CREATION));
+                } else if (screen == Screen.RESULT){
+                    if (game.screens.get(Screen.RESULT) == null) {
+                        //game.screens.put(Screen.RESULT, new ResultScreen(false, "undefined", null));
+                        throw new IllegalStateException("Result screen is not defined");
+                    }
+                    game.setScreen(game.screens.get(Screen.RESULT));
                 }
             }
         });
@@ -200,5 +202,13 @@ public class LKGame extends Game {
     public static void setMap(TiledMap map){
         LKGame game = getInstance();
         game.map = map;
+    }
+
+    public enum Screen{
+        MAIN,
+        MULTIPLAYER,
+        SERVER_CREATION,
+        GAME,
+        RESULT
     }
 }
