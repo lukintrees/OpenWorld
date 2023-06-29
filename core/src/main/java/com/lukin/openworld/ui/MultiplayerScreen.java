@@ -32,7 +32,7 @@ public class MultiplayerScreen implements Screen {
         Image reloadImage = new Image(new Texture(Gdx.files.internal("popular_icons/reload.png")));
         refreshButton.addActor(reloadImage);
         refreshButton.space(10);
-        Label reloadText = new Label("обновить", new Label.LabelStyle(LKGame.getDefaultFont(), Color.WHITE));
+        Label reloadText = new Label("обновить\nсписок", new Label.LabelStyle(LKGame.getDefaultFont(), Color.WHITE));
         refreshButton.addActor(reloadText);
         refreshButton.setPosition(10, 150);
         ClickListener clickListener = new ClickListener() {
@@ -41,15 +41,10 @@ public class MultiplayerScreen implements Screen {
                 new Thread() {
                     @Override
                     public void run() {
-                        devicesList.updateDevices(LKGame.getMultiplayer().getPairedConnections());
+                        devicesList.updateDevices();
                     }
                 }.start();
                 return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-
             }
         };
         reloadText.addListener(clickListener);

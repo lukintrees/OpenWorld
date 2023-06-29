@@ -56,11 +56,11 @@ public class ResultScreen implements Screen {
 
                 PvPMode.Team team1 = pvpMode.getTeams().get(0);
                 Label team1Result = new Label((team1.name == null ? "Игрок 1" : team1.name) + ": " + team1.score, labelStyle);
-                resultTable.add(team1Result).row();
+                resultTable.add(team1Result).padBottom(10).row();
 
                 PvPMode.Team team2 = pvpMode.getTeams().get(1);
                 Label team2Result = new Label((team2.name == null ? "Игрок 2" : team2.name) + ": " + team2.score, labelStyle);
-                resultTable.add(team2Result).row();
+                resultTable.add(team2Result).padBottom(20).row();
             }else if (enumMode == GameScreen.GameMode.DUNGEON){
 
             }
@@ -113,5 +113,20 @@ public class ResultScreen implements Screen {
 
     @Override
     public void dispose() {
+    }
+
+    public static ResultScreen deserialize(String data, Mode mode){
+        String[] dataList = data.split(",");
+        if (GameScreen.GameMode.valueOf(dataList[2]) == GameScreen.GameMode.PVP) {
+            if (dataList[0].equals("Выиграл")){
+                dataList[0] = "Проиграл";
+            }else if (dataList[0].equals("Проиграл")){
+                dataList[0] = "Выиграл";
+            }
+        }
+        if (dataList[1].equals("ты умер")) {
+            dataList[1] = "союзник умер";
+        }
+        return new ResultScreen(dataList[0], dataList[1], mode);
     }
 }

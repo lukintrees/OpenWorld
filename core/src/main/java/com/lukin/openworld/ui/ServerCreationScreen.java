@@ -27,6 +27,8 @@ public class ServerCreationScreen implements Screen {
     private HorizontalGroup chooseTime;
     private boolean screenUsedBefore;
     private Label createButton;
+    private Label infoModeLabel;
+    private Label infoTimeLabel;
 
     public ServerCreationScreen() {
         this.stage = LKGame.getStage();
@@ -48,8 +50,11 @@ public class ServerCreationScreen implements Screen {
             infoLabel.setPosition(30, stage.getHeight() - 40);
             infoLabel.setFontScale(20 / LKGame.getDefaultFont().getXHeight());
 
+            infoModeLabel = new Label("Выбор режима", labelStyle);
+            infoModeLabel.setPosition(30, stage.getHeight() - 100);
+
             chooseMode = new HorizontalGroup();
-            chooseMode.setPosition(30, stage.getHeight() - 100);
+            chooseMode.setPosition(30, stage.getHeight() - 120);
 
             Texture buttonTexture = LKGame.getAssetManager().get("popular_icons/play.png", Texture.class);
             TextureRegion region = new TextureRegion(buttonTexture);
@@ -71,20 +76,39 @@ public class ServerCreationScreen implements Screen {
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                     super.touchUp(event, x, y, pointer, button);
                     int indexOfCurrentText = modeStrings.indexOf(modeLabel.getText().toString(), false);
-                    modeLabel.setText(indexOfCurrentText > 0 ? modeStrings.get(indexOfCurrentText - 1) : modeLabel.getText());
+                    if (indexOfCurrentText > 0) {
+                        boolean visible = modeStrings.get(indexOfCurrentText - 1).equals("Игрок против игрока");
+                        chooseTime.setVisible(visible);
+                        infoTimeLabel.setVisible(visible);
+                        modeLabel.setText(modeStrings.get(indexOfCurrentText - 1));
+                    }else{
+                        modeLabel.setText(modeLabel.getText());
+                    }
                 }
             });
             rightButton.addListener(new ClickListener(){
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                     super.touchUp(event, x, y, pointer, button);
-                    int indexOfNextText = modeStrings.indexOf(modeLabel.getText().toString(), false) + 1;
-                    modeLabel.setText(indexOfNextText < modeStrings.size ? modeStrings.get(indexOfNextText) : modeLabel.getText());
+                    int indexOfCurrentText = modeStrings.indexOf(modeLabel.getText().toString(), false);
+                    if (indexOfCurrentText + 1 < modeStrings.size) {
+                        boolean visible = modeStrings.get(indexOfCurrentText + 1).equals("Игрок против игрока");
+                        chooseTime.setVisible(visible);
+                        infoTimeLabel.setVisible(visible);
+                        modeLabel.setText(modeStrings.get(indexOfCurrentText + 1));
+                    }else {
+                        modeLabel.setText(modeLabel.getText());
+                    }
                 }
             });
 
+            infoTimeLabel = new Label("Длительность", labelStyle);
+            infoTimeLabel.setVisible(false);
+            infoTimeLabel.setPosition(30, stage.getHeight() - 160);
+
             chooseTime = new HorizontalGroup();
-            chooseTime.setPosition(30, stage.getHeight() - 130);
+            chooseTime.setVisible(false);
+            chooseTime.setPosition(30, stage.getHeight() - 175);
             chooseTime.invalidate();
 
             leftButton = new Image(region);
@@ -116,20 +140,24 @@ public class ServerCreationScreen implements Screen {
             });
 
             createButton = new Label("Создать сервер", labelStyle);
-            createButton.setPosition(30, stage.getHeight() - 180);
+            createButton.setPosition(30, stage.getHeight() - 210);
 
             createButton.addListener(new ClickListener(){
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                     super.touchUp(event, x, y, pointer, button);
-                    LKGame.setMap(LKGame.getMapManager().getRandomMap(GameScreen.GameMode.valueOf(modeLabel.getText().toString())));
+                    GameScreen.GameMode gameMode = GameScreen.GameMode.DUNGEON;
+
+                    LKGame.setMap(LKGame.getMapManager().getRandomMap(GameScreen.GameMode.getModeByTranslation(modeLabel.getText().toString())));
                     LKGame.getMultiplayer().startListeningForClientConnections();
                     LKGame.getMultiplayerManagerThread().onServerStart(Integer.parseInt(timeLabel.getText().toString().split(" ")[0]) * 60);
                 }
             });
         }
         stage.addActor(infoLabel);
+        stage.addActor(infoModeLabel);
         stage.addActor(chooseMode);
+        stage.addActor(infoTimeLabel);
         stage.addActor(chooseTime);
         stage.addActor(createButton);
     }

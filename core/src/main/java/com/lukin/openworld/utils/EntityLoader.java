@@ -74,6 +74,7 @@ public class EntityLoader{
         WeaponJson weapon = new WeaponJson();
         weapon.id = value.getInt("id");
         weapon.name = value.getString("name");
+        weapon.delayFromAttack = value.getFloat("delay_from_attack");
         String[] textureString = value.getString("texture").split(":");
         if (textureString[0].equals("tile")) {
             weapon.texture = new AssetDescriptor<>(WEAPON_FILE + "/" + weapon.id + ".weapon", Texture.class,
@@ -136,6 +137,7 @@ public class EntityLoader{
     public static class WeaponJson {
         public int id;
         public String name;
+        public float delayFromAttack;
         public AssetDescriptor<Texture> texture;
         public AssetDescriptor<Texture> bulletTexture;
     }

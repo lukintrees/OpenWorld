@@ -36,6 +36,7 @@ public class Enemy extends LKEntity {
         EntityLoader.WeaponJson weapon = entityLoader.getWeapon(weaponId);
         weaponComponent.texture = LKGame.getAssetManager().get(weapon.texture);
         weaponComponent.bulletTexture = LKGame.getAssetManager().get(weapon.bulletTexture);
+        weaponComponent.delayFromAttackBasic = weapon.delayFromAttack;
     }
 
     public Enemy(int entityUID, int entityId, int weaponId, boolean direction, Vector2 position, float animationTime) {

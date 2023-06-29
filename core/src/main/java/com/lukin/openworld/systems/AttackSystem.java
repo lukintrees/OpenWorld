@@ -17,6 +17,7 @@ import com.lukin.openworld.components.SwordComponent;
 import com.lukin.openworld.entities.Enemy;
 import com.lukin.openworld.entities.LKEntity;
 import com.lukin.openworld.entities.LocalPlayer;
+import com.lukin.openworld.entities.RemotePlayer;
 import com.lukin.openworld.ui.GameScreen;
 import com.lukin.openworld.ui.ResultScreen;
 import com.lukin.openworld.utils.Mode;
@@ -120,9 +121,12 @@ public class AttackSystem extends EntitySystem implements EntityListener {
                 if (gameMode != null && gameMode.is(GameScreen.GameMode.PVP)){
                     ((GameScreen) LKGame.getScreens().get(LKGame.Screen.GAME)).createLocalPlayer();
                 }else if (gameMode == null && entity.getComponent(EntityComponent.class).health <= 0){
-                    LKGame.getScreens().put(LKGame.Screen.RESULT, new ResultScreen("Проиграл", "ты умер", gameMode));
+                    LKGame.getScreens().put(LKGame.Screen.RESULT, new ResultScreen("Проиграл", "ты умер", null));
                     LKGame.setScreen(LKGame.Screen.RESULT);
                 }
+            }else if (entity instanceof RemotePlayer && gameMode == null){
+                LKGame.getScreens().put(LKGame.Screen.RESULT, new ResultScreen("Проиграл", "союзник умер", null));
+                LKGame.setScreen(LKGame.Screen.RESULT);
             }
         }
     }

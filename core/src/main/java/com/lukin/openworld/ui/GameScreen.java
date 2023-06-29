@@ -293,5 +293,14 @@ public class GameScreen implements Screen {
         public String getTranslation(){
             return translation;
         }
+        public static GameMode getModeByTranslation(String translation){
+            GameMode[] gameModes = GameMode.values();
+            for(GameMode gameMode : gameModes){
+                if (gameMode.getTranslation().equals(translation)){
+                    return gameMode;
+                }
+            }
+            return null;
+        }
     }
 }

@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.lukin.openworld.LKGame;
 import com.lukin.openworld.components.BulletComponent;
 import com.lukin.openworld.components.EntityComponent;
@@ -19,6 +20,7 @@ import com.lukin.openworld.entities.LKEntity;
 import com.lukin.openworld.entities.LocalPlayer;
 import com.lukin.openworld.entities.RemotePlayer;
 import com.lukin.openworld.ui.GameScreen;
+import com.lukin.openworld.ui.ResultScreen;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,9 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MultiplayerManagerThread extends Thread implements EntityListener {
+public class MultiplayerManagerThread extends Thread implements EntityListener, ScreenChangeListener {
     private final HashMap<Integer, String> syncEntities = new HashMap<>();
-    private String searializedGameModeString;
+    private String serializedGameModeString;
     private final Multiplayer multiplayer;
     private boolean isServer;
     private LocalPlayer localPlayer;
@@ -36,6 +38,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
     private GameScreen.GameMode mode;
     private Mode gameMode;
     private final Map<Device, DeviceProperties> devices = new HashMap<>();
+    private final Family family = Family.all(EntityComponent.class).get();
 
     public MultiplayerManagerThread(Multiplayer multiplayer) {
         this.multiplayer = multiplayer;
@@ -116,7 +119,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 });
                 break;
             case "remove":
-                LKEntity[] entities = engine.getEntitiesFor(Family.all(EntityComponent.class).get()).toArray(LKEntity.class);
+                LKEntity[] entities = engine.getEntitiesFor(family).toArray(LKEntity.class);
                 int uidForRemove = Integer.parseInt(message);
                 for (LKEntity entity : entities) {
                     if (entity.entityUID == uidForRemove) {
@@ -124,8 +127,9 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                     }
                 }
                 break;
-            case "update":
-                entities = engine.getEntitiesFor(Family.all(EntityComponent.class).get()).toArray(LKEntity.class);
+            case "u":
+                //Обновление сущностей
+                entities = engine.getEntitiesFor(family).toArray(LKEntity.class);
                 int uidForUpdate = Integer.parseInt(message.split("~")[1]);
                 for (LKEntity entity : entities) {
                     if (entity.entityUID == uidForUpdate) {
@@ -144,10 +148,15 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 break;
             case "set":
                 tmp = message.split("\\|");
-                if(gameMode == null){
-                    gameMode = new PvPMode();
+                if (tmp[0].equals("teams")) {
+                    if(gameMode == null){
+                        gameMode = new PvPMode();
+                    }
+                    gameMode.deserialize(tmp[1]);
+                }else if(tmp[0].equals("screen")){
+                    LKGame.getScreens().put(LKGame.Screen.RESULT, ResultScreen.deserialize(tmp[2], gameMode));
+                    LKGame.setScreen(LKGame.Screen.RESULT);
                 }
-                gameMode.deserialize(tmp[1]);
         }
     }
 
@@ -179,7 +188,8 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 msg.append(((GameScreen) LKGame.getScreens().get(LKGame.Screen.GAME)).getTime());
                 write(device, msg.toString());
                 break;
-            case "update":
+            case "u":
+                //Обновление сущностей
                 entities = engine.getEntitiesFor(Family.all(EntityComponent.class).get()).toArray(LKEntity.class);
                 int uidForUpdate = Integer.parseInt(message.split("~")[1]);
                 for (LKEntity entity : entities) {
@@ -240,7 +250,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
                 StringBuilder entityString1 = serializeEntity(entity);
                 if (!entityString.equals(entityString1.toString())) {
                     syncEntities.put(entity.entityUID, entityString1.toString());
-                    String msg = "update|".concat(entityString1.toString());
+                    String msg = "u|".concat(entityString1.toString());
                     for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()) {
                         if (device.getValue().player != entity){
                             write(device.getKey(), msg);
@@ -250,8 +260,8 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
             }
             if (mode == GameScreen.GameMode.PVP){
                 String serializedGameMode = gameMode.serialize();
-                if (!serializedGameMode.equals(searializedGameModeString)){
-                    searializedGameModeString = serializedGameMode;
+                if (!serializedGameMode.equals(serializedGameModeString)){
+                    serializedGameModeString = serializedGameMode;
                     String msg = "set|teams|".concat(serializedGameMode);
                     for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()) {
                         write(device.getKey(), msg);
@@ -272,7 +282,7 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
             String serializedLocalPlayer = serializeEntity(localPlayer).toString();
             if (syncEntities.get(localPlayer.entityUID) == null || !syncEntities.get(localPlayer.entityUID).equals(serializedLocalPlayer)) {
                 syncEntities.put(localPlayer.entityUID, serializedLocalPlayer);
-                String msg = "update|".concat(serializedLocalPlayer);
+                String msg = "u|".concat(serializedLocalPlayer);
                 for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()) {
                     write(device.getKey(), msg);
                 }
@@ -350,6 +360,17 @@ public class MultiplayerManagerThread extends Thread implements EntityListener {
             for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()) {
                 write(device.getKey(), msg);
                 syncEntities.remove(lkEntity.entityUID);
+            }
+        }
+    }
+
+    @Override
+    public void screenChanged(LKGame.Screen enumScreen, Screen screenObject) {
+        if (enumScreen == LKGame.Screen.RESULT){
+            ResultScreen resultScreen = (ResultScreen) screenObject;
+            String msg = "set|screen|" + enumScreen + "|" + resultScreen;
+            for (Map.Entry<Device, DeviceProperties> device : devices.entrySet()){
+                write(device.getKey(), msg);
             }
         }
     }

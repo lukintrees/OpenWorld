@@ -182,9 +182,11 @@ public class TCPMultiplayer implements Multiplayer{
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
                     Gdx.app.error("TCP", "Socket's accept() method failed", e);
+                    if (mmServerSocket.isClosed()){
+                        Gdx.app.log("TCP", "Server closed");
+                    }
                     break;
                 }
-
                 if (socket != null) {
                     manageThread = new ManageThread(socket, LKGame.getMultiplayerManagerThread());
                     manageThread.start();

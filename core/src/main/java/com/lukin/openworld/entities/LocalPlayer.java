@@ -26,5 +26,6 @@ public class LocalPlayer extends LKEntity{
         EntityLoader.WeaponJson weapon = entityLoader.getWeapon(weaponId);
         weaponComponent.texture = LKGame.getAssetManager().get(weapon.texture);
         weaponComponent.bulletTexture = LKGame.getAssetManager().get(weapon.bulletTexture);
+        weaponComponent.delayFromAttackBasic = weapon.delayFromAttack;
     }
 }
