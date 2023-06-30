@@ -29,6 +29,7 @@ public class ServerCreationScreen implements Screen {
     private Label createButton;
     private Label infoModeLabel;
     private Label infoTimeLabel;
+    private BackButton backButton;
 
     public ServerCreationScreen() {
         this.stage = LKGame.getStage();
@@ -44,10 +45,13 @@ public class ServerCreationScreen implements Screen {
     @Override
     public void show() {
         if(!screenUsedBefore) {
+            backButton = new BackButton(LKGame.Screen.MULTIPLAYER);
+            backButton.setPosition(10, stage.getHeight() - backButton.getHeight() - 15);
+
             Label.LabelStyle labelStyle = new Label.LabelStyle(LKGame.getDefaultFont(), Color.WHITE);
 
             infoLabel = new Label("Создание нового сервера", labelStyle);
-            infoLabel.setPosition(30, stage.getHeight() - 40);
+            infoLabel.setPosition(30, stage.getHeight() - 60);
             infoLabel.setFontScale(20 / LKGame.getDefaultFont().getXHeight());
 
             infoModeLabel = new Label("Выбор режима", labelStyle);
@@ -154,6 +158,7 @@ public class ServerCreationScreen implements Screen {
                 }
             });
         }
+        stage.addActor(backButton);
         stage.addActor(infoLabel);
         stage.addActor(infoModeLabel);
         stage.addActor(chooseMode);

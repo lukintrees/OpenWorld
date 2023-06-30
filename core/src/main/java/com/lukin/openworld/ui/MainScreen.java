@@ -44,10 +44,13 @@ public class MainScreen implements Screen {
 
             Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
             Label startButton = new Label("Начать приключение", labelStyle);
-            startButtons.add(startButton).padRight(50);
+            startButtons.add(startButton).padRight(30);
 
             Label multiplayerButton = new Label("Сетевая игра", labelStyle);
-            startButtons.add(multiplayerButton);
+            startButtons.add(multiplayerButton).padRight(30);
+
+            Label difficultyChangeButton = new Label("Изменение сложности", labelStyle);
+            startButtons.add(difficultyChangeButton);
 
             startButtons.setPosition(stage.getWidth() / 2f - startButtons.getWidth() / 2f, 100);
 
@@ -74,6 +77,14 @@ public class MainScreen implements Screen {
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                     LKGame.setScreen(LKGame.Screen.MULTIPLAYER);
+                }
+            });
+
+            difficultyChangeButton.addListener(new ClickListener(){
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    super.touchUp(event, x, y, pointer, button);
+                    LKGame.setScreen(LKGame.Screen.DIFFICULTY_CHANGE);
                 }
             });
         }

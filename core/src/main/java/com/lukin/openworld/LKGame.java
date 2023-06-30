@@ -17,11 +17,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.lukin.openworld.ui.DifficultyChangeScreen;
 import com.lukin.openworld.ui.GameScreen;
 import com.lukin.openworld.ui.MainScreen;
 import com.lukin.openworld.ui.MultiplayerScreen;
 import com.lukin.openworld.ui.ResultScreen;
 import com.lukin.openworld.ui.ServerCreationScreen;
+import com.lukin.openworld.utils.DifficultyManager;
 import com.lukin.openworld.utils.MapManager;
 import com.lukin.openworld.utils.MultiplayerManagerThread;
 import com.lukin.openworld.utils.EntityLoader;
@@ -50,6 +52,7 @@ public class LKGame extends Game {
     private MultiplayerManagerThread multiplayerManagerThread;
     private AssetManager assetManager;
     private MapManager mapManager;
+    private DifficultyManager difficultyManager;
     private static LKGame instance;
 
 
@@ -63,6 +66,7 @@ public class LKGame extends Game {
         assetManager = new AssetManager();
         assetManager.setLoader(TiledMap.class, new TmxMapLoader());
         entityLoader = new EntityLoader();
+        difficultyManager = new DifficultyManager();
         map = new TmxMapLoader().load("map/map-1-dungeon.tmx");
         loadAllAssets();
         stage = new Stage(new FitViewport(20 * 16 * 1.78f, 20 * 16));
@@ -137,6 +141,11 @@ public class LKGame extends Game {
                         throw new IllegalStateException("Result screen is not defined");
                     }
                     game.setScreen(game.screens.get(Screen.RESULT));
+                } else if (screen == Screen.DIFFICULTY_CHANGE) {
+                    if (game.screens.get(Screen.DIFFICULTY_CHANGE) == null) {
+                        game.screens.put(Screen.DIFFICULTY_CHANGE, new DifficultyChangeScreen());
+                    }
+                    game.setScreen(game.screens.get(Screen.DIFFICULTY_CHANGE));
                 }
             }
         });
@@ -198,6 +207,9 @@ public class LKGame extends Game {
     public static MapManager getMapManager() {
         return getInstance().mapManager;
     }
+    public static DifficultyManager getDifficultyManager(){
+        return getInstance().difficultyManager;
+    }
 
     public static void setMap(TiledMap map){
         LKGame game = getInstance();
@@ -209,6 +221,7 @@ public class LKGame extends Game {
         MULTIPLAYER,
         SERVER_CREATION,
         GAME,
-        RESULT
+        RESULT,
+        DIFFICULTY_CHANGE
     }
 }

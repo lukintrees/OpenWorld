@@ -1,6 +1,5 @@
 package com.lukin.openworld.systems;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
@@ -21,7 +20,6 @@ import com.lukin.openworld.components.EnemyHearingComponent;
 import com.lukin.openworld.components.EntityComponent;
 import com.lukin.openworld.components.EntityComponent.EntityType;
 import com.lukin.openworld.components.HitboxComponent;
-import com.lukin.openworld.components.InputComponent;
 import com.lukin.openworld.components.SteeringComponent;
 import com.lukin.openworld.components.WeaponPlayerComponent;
 import com.lukin.openworld.entities.Bullet;
@@ -42,6 +40,7 @@ public class EnemySystem extends EntitySystem implements EntityListener {
 
     @Override
     public void update(float deltaTime) {
+        float difficultyRate = LKGame.getDifficultyManager().getDifficultyRate();
         for (Entity entity : entities) {
             actHearingActivity(deltaTime, entity);
             WeaponPlayerComponent weaponPlayerComponent = entity.getComponent(WeaponPlayerComponent.class);
@@ -143,10 +142,12 @@ public class EnemySystem extends EntitySystem implements EntityListener {
         float bulletOffsetY = weaponLength * MathUtils.sin(adjustedAngle);
         bulletHitbox.setPosition(weaponOriginX + bulletOffsetX, weaponOriginY + bulletOffsetY);
         bulletComponent.velocity.setAngleRad(angle);
-        bulletComponent.textureRotation = angle * MathUtils.radiansToDegrees;
+        bulletComponent.textureRotation = angle * MathUtils.radiansToDegrees + MathUtils.random(LKGame.getDifficultyManager().getDifficultyRateReverse() * -20, LKGame.getDifficultyManager().getDifficultyRateReverse() * 20);
         bulletComponent.owner = (LKEntity) owner;
         getEngine().addEntity(bullet);
-        weaponPlayerComponent.delayFromAttack = weaponPlayerComponent.delayFromAttackBasic + MathUtils.random(0.1f, 0.4f);
+        float randomRateMin = LKGame.getDifficultyManager().getDifficultyRateReverse() * 0.3f;
+        float randomRateMax = LKGame.getDifficultyManager().getDifficultyRateReverse();
+        weaponPlayerComponent.delayFromAttack = weaponPlayerComponent.delayFromAttackBasic + MathUtils.random(randomRateMin, randomRateMax);
     }
 
     private void setWeaponRotation(Entity owner, HitboxComponent ownerHitbox, HitboxComponent targetHitbox, WeaponPlayerComponent weapon){

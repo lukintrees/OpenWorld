@@ -20,6 +20,7 @@ public class MultiplayerScreen implements Screen {
     private final Stage stage;
     private DeviceList devicesList;
     private HorizontalGroup refreshButton;
+    private BackButton backButton;
 
     public MultiplayerScreen(){
         this.stage = LKGame.getStage();
@@ -27,6 +28,8 @@ public class MultiplayerScreen implements Screen {
 
     @Override
     public void show() {
+        backButton = new BackButton(LKGame.Screen.MAIN);
+        backButton.setPosition(10, stage.getHeight() - backButton.getHeight() - 15);
         refreshButton = new HorizontalGroup();
         refreshButton.setTouchable(Touchable.enabled);
         Image reloadImage = new Image(new Texture(Gdx.files.internal("popular_icons/reload.png")));
@@ -62,6 +65,7 @@ public class MultiplayerScreen implements Screen {
         stage.addActor(startServer);
         stage.addActor(refreshButton);
         stage.addActor(devicesList);
+        stage.addActor(backButton);
         new Thread(){
             @Override
             public void run() {

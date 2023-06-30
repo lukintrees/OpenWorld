@@ -1,10 +1,5 @@
 package com.lukin.openworld.entities;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.lukin.openworld.LKGame;
 import com.lukin.openworld.components.AnimationComponent;
@@ -28,8 +23,9 @@ public class Enemy extends LKEntity {
         add(new EnemyHearingComponent());
         add(new EnemyComponent());
         EntityComponent entityComponent = addAndReturn(new EntityComponent(EntityComponent.EntityType.ENEMY, EntityComponent.EntityState.NEUTRAL));
-        entityComponent.setHealth(50f);
-        entityComponent.setMaxHealth(50f);
+        float health = 60 * LKGame.getDifficultyManager().getDifficultyRate();
+        entityComponent.setHealth(health);
+        entityComponent.setMaxHealth(health);
         AnimationComponent animationComponent = addAndReturn(new AnimationComponent());
         animationComponent.animation = LKGame.getAssetManager().get(entityLoader.getEntity(entityId).animation);
         WeaponPlayerComponent weaponComponent = addAndReturn(new WeaponPlayerComponent());
