@@ -5,9 +5,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -15,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.lukin.openworld.LKGame;
+import com.lukin.openworld.ui.GameScreen.GameMode;
 
 public class MainScreen implements Screen {
     private final BitmapFont font;
@@ -65,6 +63,7 @@ public class MainScreen implements Screen {
 
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    LKGame.setMap(LKGame.getMapManager().getRandomMap(GameMode.DUNGEON));
                     LKGame.setScreen(LKGame.Screen.GAME);
                 }
             });
@@ -88,8 +87,6 @@ public class MainScreen implements Screen {
                 }
             });
         }
-        //LKGame.setMap(new TmxMapLoader().load("map/map-1.tmx"));
-        LKGame.setMap(LKGame.getMapManager().getMap(MathUtils.random(1, 2)));
         stage.addActor(gameLabel);
         stage.addActor(startButtons);
         stage.addActor(copyright);

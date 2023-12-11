@@ -109,7 +109,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0, 0, 0, 0);
+        ScreenUtils.clear(0.043f, 0.039f, 0.043f, 1);
         batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
         if(mapRenderer == null){
